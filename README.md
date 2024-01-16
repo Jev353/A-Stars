@@ -3,7 +3,7 @@
 ### Description
 This application is designed to provide students at Washington State University with a helpful GPS, to help guide them as they walk along the Pullman campus, looking for the correct building for which their classes are being held.
 ### Collaborators
-  WSU ID	  Name	          Email	                  
+  WSU ID 	  Name	          Email	                  
   11802879	Joshua Evans	  Joshua.d.evans@wsu.edu	CONTACT
   
   11759304	Grace Anderson	grace.j.anderson@wsu.edu	
