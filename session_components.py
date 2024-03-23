@@ -1,7 +1,11 @@
+from map_components import Node
+from map_components import Edge
+from map_components import Schedule
+
 ### Used to access and retrieve database information
 class DatabaseAccessor():
     ## Constructor
-    def __init__(self, accessKey):
+    def __init__(self, accessKey: str):
         ## TODO: Login to database
         pass
     
@@ -10,17 +14,17 @@ class DatabaseAccessor():
     ##### otherwise we'll have to load an entire database table whenever we load the page
     
     ## Returns a list of user schedules
-    def getUserSchedules(self, userID):
+    def getUserSchedules(self, userID: str):
         ## TODO Something like: SELECT schedule FROM users WHERE id=userID
         pass
     
     ## Returns a list of routes within a given schedule
-    def getRoutesInSchedule(self, scheduleID):
+    def getRoutesInSchedule(self, scheduleID: str):
         ## TODO Something like: SELECT route FROM routes WHERE scheduleID=scheduleID
         pass
     
     ## Returns a bool indicating whether or not the given login information is valid
-    def verifyLogin(self, username, password):
+    def verifyLogin(self, username: str, password: str):
         ## TODO: Idk this is someone else's job
         pass
 
@@ -31,13 +35,13 @@ class AStar():
         pass
     
     ## Returns a list of edges(?) which connect the startNode and endNode
-    def generateRoutePath(self, startNodeID, endNodeID, avoidStairs, avoidSteepTerrain):
+    def generateRoutePath(self, startNodeID: str, endNodeID: str, avoidStairs: str=False, avoidSteepTerrain: str=False):
         ## TODO: A buncha nonsense
         pass
 
 ### Represents a user
 class User():
     ## Constructor
-    def __init__(self, id, schedules):
+    def __init__(self, id: str, schedules: list[Schedule]):
         self.id = id
         self.schedules = schedules
