@@ -3,6 +3,7 @@ class Node():
     ## Constructor
     def __init__(self, id, xCoordinate, yCoordinate, altitude, edges):
         self.id = id
+        
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
         self.altitude = altitude
@@ -27,8 +28,10 @@ class BuildingNode(Node):
 ### Represents an edge within the graph
 class Edge():
     ## Constructor
-    def __init__(self, isStair, nodes):
+    def __init__(self, id, isStair, nodes):
         # TODO: Decide how we'll estimate time of edge
+        self.id = id
+        
         self.isStair = isStair
         self.nodes = nodes
         self.elevationChange = abs(nodes[0].altitude - nodes[1].altitude)
@@ -45,7 +48,9 @@ class Route():
 ### Represents a route that is specifically saved to a schedule
 class ScheduleRoute(Route):
     ## Constructor
-    def __init__(self, name, startTime, endTime, startNodeID, endNodeID, avoidStairs=False, avoidSteepTerrain=False):
+    def __init__(self, id, name, startTime, endTime, startNodeID, endNodeID, avoidStairs=False, avoidSteepTerrain=False):
+        self.id = id
+        
         ## TODO: This requires A*. We'll pass the startNodeID, endNodeID, and settings
         ## to A* and it'll return a list of nodes, which will be the route's "edges" var
         self.name = name
@@ -56,7 +61,8 @@ class ScheduleRoute(Route):
 ### Represents a schedule
 class Schedule():
     ## Constructor
-    def __init__(self, name, scheduleRoutes):
+    def __init__(self, id, name, scheduleRoutes):
+        self.id = id
         self.name = name
         self.scheduleRoutes = scheduleRoutes
         
