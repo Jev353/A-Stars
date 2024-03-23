@@ -32,3 +32,34 @@ class Edge():
         self.isStair = isStair
         self.nodes = nodes
         self.elevationChange = abs(nodes[0].altitude - nodes[1].altitude)
+        
+### Represents a route    
+class Route():
+    ## Constructor
+    def __init__(self, startNodeID, endNodeID, avoidStairs=False, avoidSteepTerrain=False):
+        ## TODO: This requires A*. We'll pass the startNodeID, endNodeID, and settings
+        ## to A* and it'll return a list of nodes, which will be the route's "edges" var
+        pass
+        # edges = AStar.generateRoutePath(startNodeID, endNodeID, avoidStairs, avoidSteepTerrain)
+        
+### Represents a route that is specifically saved to a schedule
+class ScheduleRoute(Route):
+    ## Constructor
+    def __init__(self, name, startTime, endTime, startNodeID, endNodeID, avoidStairs=False, avoidSteepTerrain=False):
+        ## TODO: This requires A*. We'll pass the startNodeID, endNodeID, and settings
+        ## to A* and it'll return a list of nodes, which will be the route's "edges" var
+        self.name = name
+        self.startTime = startTime
+        self.endTime = endTime
+        # edges = AStar.generateRoutePath(startNodeID, endNodeID, avoidStairs, avoidSteepTerrain)
+        
+### Represents a schedule
+class Schedule():
+    ## Constructor
+    def __init__(self, name, scheduleRoutes):
+        self.name = name
+        self.scheduleRoutes = scheduleRoutes
+        
+    ## Adds the given ScheduleRoute to this Schedule's scheduleRoutes
+    def addScheduleRoute(self, scheduleRoute):
+        self.scheduleRoutes.append(scheduleRoute)
