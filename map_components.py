@@ -4,17 +4,20 @@ from datetime import datetime
 ### Represents a node within the graph
 class Node():
     ## Constructor
-    def __init__(self, id: str, xCoordinate: int, yCoordinate: int, altitude: float, edges: list[Edge]):
+    def __init__(self, id: str, xCoordinate: int, yCoordinate: int, altitude: float, edges: list[Edge] = []):
         self.id = id
         
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
         self.altitude = altitude
-        self.edges = edges
+        self._edges = edges
 
     ## Returns whether or not this node is a building
     def isBuilding(self) -> bool:
         return isinstance(self, BuildingNode)
+    
+    def __str__(self):
+        return "O"
     
 ### Represents a BuildingNode within the graph
 class BuildingNode(Node):
@@ -72,3 +75,53 @@ class Schedule():
     ## Adds the given ScheduleRoute to this Schedule's scheduleRoutes
     def addScheduleRoute(self, scheduleRoute: ScheduleRoute):
         self.scheduleRoutes.append(scheduleRoute)
+        
+### Represents a graph
+class Graph():
+    ## Constructor
+    def __init__(self, width: int, height: int):
+        self.nodes: list[list[Node]] = [[]] # 2D list of nodes
+        self.width = width
+        self.height = height
+        
+        # Initialize variables for node construction
+        nodesMade: int = 0 # Used to increment node IDs
+        
+        # Iterate through nodes, placing a node at each index
+        for y in range(height):
+            # Iterate through width
+            for x in range(width):
+                # Create new node
+                newNode = Node(str(nodesMade), x, y, 0.0)
+                
+                # Add new node to list of nodes
+                self.nodes[y].append(newNode)
+                
+            self.nodes.append([])
+            
+    ## Gets the node at (xCoor, yCoor)
+    def getNodeFromCoor(self, xCoor: int, yCoor: int):
+        return self.nodes[xCoor][yCoor]
+    
+    ## Gets the node with id "nodeID"
+    def getNodeFromID(self, nodeID: str):
+        # Iterate through all nodes until node is found
+        for x in range(self.width):
+            for y in range(self.height):
+                if self.nodes[x][y].id == nodeID:
+                    return self.nodes[x][y]
+                
+        # If we've reached here, the node wasn't found. Return None
+        return None
+    
+    ## Prints the graph to the console
+    def printGraph(self):
+        # Iterate through graph, printing each node
+        for y in range(self.height):
+            for x in range(self.width):
+                # Add "--" to represent edge if not at end of row
+                if x < self.width - 1:
+                    print(self.nodes[y][x], end='-')
+                # Add newline if at end of row
+                else:
+                    print(self.nodes[y][x])
