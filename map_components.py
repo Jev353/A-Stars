@@ -1,23 +1,36 @@
 from __future__ import annotations
 from datetime import datetime
+from copy import deepcopy
 
 ### Represents a node within the graph
 class Node():
     ## Constructor
-    def __init__(self, id: str, xCoordinate: int, yCoordinate: int, altitude: float, edges: list[Edge] = []):
+    def __init__(self, id: str, xCoordinate: int, yCoordinate: int, altitude: float):
         self.id = id
         
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
         self.altitude = altitude
-        self.edges = edges
+        self.edges = []
+        
+        self.gScore = float("inf") # Weight cost from start node to this node
+        self.hScore = 0            # Heuristic
+        self.fScore = float("inf") # gScore + hScore
+        
+        self.parentID = self.id # The ID of the "parent" of this node. The parent represents the node
+                                # which comes before this node on a given A* path
 
     ## Returns whether or not this node is a building
     def isBuilding(self) -> bool:
         return isinstance(self, BuildingNode)
     
-    def __str__(self):
-        return "O"
+    ## Overrides less than or equal to
+    def __le__(self, other):
+        return self.fScore <= other.fScore
+    
+    ## Overrides less than
+    def __lt__(self, other):
+        return self.fScore < other.fScore
     
 ### Represents a BuildingNode within the graph
 class BuildingNode(Node):
@@ -34,9 +47,10 @@ class BuildingNode(Node):
 ### Represents an edge within the graph
 class Edge():
     ## Constructor
-    def __init__(self, id: str, isStair: bool, nodes: list[Node] = []):
+    def __init__(self, id: str, weight: int, isStair: bool, nodes: list[Node] = []):
         # TODO: Decide how we'll estimate time of edge
         self.id = id
+        self.weight = weight
         
         if len(nodes) > 2:
             raise Exception("Edge <" + id + "> is trying to connect " + len(nodes) + " nodes")
@@ -44,6 +58,19 @@ class Edge():
         self.isStair = isStair
         self.nodes = nodes
         self.elevationChange = abs(nodes[0].altitude - nodes[1].altitude)
+        
+    # Given a node that this edge connects to, returns the other node that this edge connects to
+    def getOtherNode(self, firstNode: Node) -> Node:
+        # Ensure the given node is connected to this edge
+        if firstNode in self.nodes:
+            # Return the node that is not the given node
+            for node in self.nodes:
+                if node != firstNode:
+                    return node
+            # If we got here, then somehow the edge is linked to the same node twice
+            raise Exception("Edge <" + self.id + "> connects node <" + firstNode.id + "> to itself.")
+        else:
+            raise Exception("Node <" + firstNode.id + "> is not linked to edge <" + self.id + ">")
                
 ### Represents a route    
 class Route():
@@ -82,11 +109,17 @@ class Schedule():
 ### Represents a graph
 class Graph():
     ## Constructor
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, copy: bool = False, nodesToCopy: list[list[Node]] = None):
         self.nodes: list[list[Node]] = [[]] # 2D list of nodes
         self.width = width
         self.height = height
         
+        # If this is requesting a copy, then copy all the nodes in nodesToCopy instead of initializing new ones
+        if (copy):
+            # [:] applies to all element in list, so make a list of copies of rows in self.nodes
+            self.nodes = [row[:] for row in nodesToCopy]
+            return
+            
         # Initialize variables for node construction
         nodesMade: int = 0 # Used to increment node IDs
         
@@ -112,14 +145,14 @@ class Graph():
             for x in range(width):
                 # Connect current node to node below it, if not at bottom of graph
                 if y < height - 1:
-                    newVerticalEdge = Edge(str(edgesMade), False, [self.nodes[y][x], self.nodes[y+1][x]])
+                    newVerticalEdge = Edge(str(edgesMade), 1, False, [self.nodes[y][x], self.nodes[y+1][x]])
                     self.nodes[y][x].edges.append(newVerticalEdge)
                     self.nodes[y+1][x].edges.append(newVerticalEdge)
                     edgesMade += 1
                     
                 # Connect current node to node to its right, if not at right edge of graph
                 if x < width - 1:
-                    newHorizontalEdge = Edge(str(edgesMade), False, [self.nodes[y][x], self.nodes[y][x+1]])
+                    newHorizontalEdge = Edge(str(edgesMade), 1, False, [self.nodes[y][x], self.nodes[y][x+1]])
                     self.nodes[y][x].edges.append(newHorizontalEdge)
                     self.nodes[y][x+1].edges.append(newHorizontalEdge)
                     edgesMade += 1
@@ -140,7 +173,17 @@ class Graph():
         return None
     
     ## Prints the graph to the console
-    def printGraph(self, startNodeID: str = None, goalNodeID: str = None):
+    def printGraph(self, startNodeID: str = None, goalNodeID: str = None, pathEdges: list[Edge] = None):
+        # Initialize pathNodes list
+        pathNodeIDs: list[Node] = []
+        
+        # If list of edges was passed, get the nodes that those edges connect
+        if pathEdges != None:
+            for edge in pathEdges:
+                for node in edge.nodes:
+                    pathNodeIDs.append(node.id)
+                
+        
         # Iterate through graph, printing each node
         for y in range(self.height):
             for x in range(self.width):
@@ -152,6 +195,9 @@ class Graph():
                     # Print node as G if goal node
                     elif goalNodeID == self.nodes[y][x].id:
                         print("G", end='-')
+                    # Print node as path node if on path
+                    elif self.nodes[y][x].id in pathNodeIDs:
+                        print("P", end='-')
                     # Print node as O if nothing special
                     else:
                         print("O", end='-')
@@ -163,6 +209,14 @@ class Graph():
                     # Print node as G if goal node
                     elif goalNodeID == self.nodes[y][x].id:
                         print("G")
+                    # Print node as path node if on path
+                    elif self.nodes[y][x].id in pathNodeIDs:
+                        print("P")
                     # Print node as O if nothing special
                     else:
                         print("O")
+        
+    # Creates a deepcopy of this graph
+    def getDeepCopy(self) -> Graph:
+        return Graph(self.width, self.height, True, self.nodes)
+        

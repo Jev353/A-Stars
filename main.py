@@ -1,4 +1,7 @@
 from map_components import Graph
+from map_components import Edge
+from map_components import Node
+from session_components import AStar
 import session_components 
 
 def main():
@@ -14,14 +17,18 @@ def main():
     goalY = int(input("Enter y coordinate of goal node: "))
     
     # Get start node and goal node
-    startNode = newGraph.getNodeFromCoor(startY, startX)
-    goalNode = newGraph.getNodeFromCoor(goalY, goalX)
+    startNode: Node = newGraph.getNodeFromCoor(startY, startX)
+    goalNode: Node = newGraph.getNodeFromCoor(goalY, goalX)
     
     # Get node IDs
     startNodeID = startNode.id
     goalNodeID = goalNode.id
     
-    newGraph.printGraph(startNodeID=startNodeID, goalNodeID=goalNodeID)
+    aStar = AStar()
+    
+    pathEdges: list[Edge] = aStar.generateRoutePath(newGraph, startNodeID, goalNodeID)
+    
+    newGraph.printGraph(startNodeID=startNodeID, goalNodeID=goalNodeID, pathEdges=pathEdges)
     
 
 main()
