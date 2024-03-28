@@ -10,7 +10,7 @@ class Node():
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
         self.altitude = altitude
-        self._edges = edges
+        self.edges = edges
 
     ## Returns whether or not this node is a building
     def isBuilding(self) -> bool:
@@ -34,9 +34,12 @@ class BuildingNode(Node):
 ### Represents an edge within the graph
 class Edge():
     ## Constructor
-    def __init__(self, id: str, isStair: bool, nodes: Node):
+    def __init__(self, id: str, isStair: bool, nodes: list[Node] = []):
         # TODO: Decide how we'll estimate time of edge
         self.id = id
+        
+        if len(nodes) > 2:
+            raise Exception("Edge <" + id + "> is trying to connect " + len(nodes) + " nodes")
         
         self.isStair = isStair
         self.nodes = nodes
@@ -89,7 +92,6 @@ class Graph():
         
         # Iterate through nodes, placing a node at each index
         for y in range(height):
-            # Iterate through width
             for x in range(width):
                 # Create new node
                 newNode = Node(str(nodesMade), x, y, 0.0)
@@ -97,7 +99,31 @@ class Graph():
                 # Add new node to list of nodes
                 self.nodes[y].append(newNode)
                 
+                # Increment nodesMade counter
+                nodesMade += 1
+                
             self.nodes.append([])
+        
+        # Initialize variables for edge construction
+        edgesMade: int = 0
+        
+        # Iterate through nodes and connect them all via edges
+        for y in range(height):
+            for x in range(width):
+                
+                # Connect current node to node below it, if not at bottom of graph
+                if y < height - 1:
+                    newVerticalEdge = Edge(str(edgesMade), False, [self.nodes[y][x], self.nodes[y+1][x]])
+                    self.nodes[y][x].edges.append(newVerticalEdge)
+                    self.nodes[y+1][x].edges.append(newVerticalEdge)
+                    edgesMade += 1
+                    
+                # Connect current node to node to its right, if not at right edge of graph
+                if x < width - 1:
+                    newHorizontalEdge = Edge(str(edgesMade), False, [self.nodes[y][x], self.nodes[y][x+1]])
+                    self.nodes[y][x].edges.append(newHorizontalEdge)
+                    self.nodes[y][x+1].edges.append(newHorizontalEdge)
+                    edgesMade += 1
             
     ## Gets the node at (xCoor, yCoor)
     def getNodeFromCoor(self, xCoor: int, yCoor: int):
@@ -106,10 +132,10 @@ class Graph():
     ## Gets the node with id "nodeID"
     def getNodeFromID(self, nodeID: str):
         # Iterate through all nodes until node is found
-        for x in range(self.width):
-            for y in range(self.height):
-                if self.nodes[x][y].id == nodeID:
-                    return self.nodes[x][y]
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.nodes[y][x].id == nodeID:
+                    return self.nodes[y][x]
                 
         # If we've reached here, the node wasn't found. Return None
         return None
