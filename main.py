@@ -5,7 +5,11 @@ from session_components import AStar
 import session_components 
 
 def main():
-    newGraph = Graph(5, 5)
+    # Get graph dimensions
+    width = int(input("Enter graph width: "))
+    height = int(input("Enter graph height: "))
+    
+    newGraph = Graph(width, height)
     newGraph.printGraph()
     
     # Get start node coordinates
