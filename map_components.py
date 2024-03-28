@@ -110,7 +110,6 @@ class Graph():
         # Iterate through nodes and connect them all via edges
         for y in range(height):
             for x in range(width):
-                
                 # Connect current node to node below it, if not at bottom of graph
                 if y < height - 1:
                     newVerticalEdge = Edge(str(edgesMade), False, [self.nodes[y][x], self.nodes[y+1][x]])
@@ -126,8 +125,8 @@ class Graph():
                     edgesMade += 1
             
     ## Gets the node at (xCoor, yCoor)
-    def getNodeFromCoor(self, xCoor: int, yCoor: int):
-        return self.nodes[xCoor][yCoor]
+    def getNodeFromCoor(self, yCoor: int, xCoor: int):
+        return self.nodes[yCoor][xCoor]
     
     ## Gets the node with id "nodeID"
     def getNodeFromID(self, nodeID: str):
@@ -141,13 +140,29 @@ class Graph():
         return None
     
     ## Prints the graph to the console
-    def printGraph(self):
+    def printGraph(self, startNodeID: str = None, goalNodeID: str = None):
         # Iterate through graph, printing each node
         for y in range(self.height):
             for x in range(self.width):
                 # Add "--" to represent edge if not at end of row
                 if x < self.width - 1:
-                    print(self.nodes[y][x], end='-')
+                    # Print node as S if start node
+                    if startNodeID == self.nodes[y][x].id:
+                        print("S", end='-')
+                    # Print node as G if goal node
+                    elif goalNodeID == self.nodes[y][x].id:
+                        print("G", end='-')
+                    # Print node as O if nothing special
+                    else:
+                        print("O", end='-')
                 # Add newline if at end of row
                 else:
-                    print(self.nodes[y][x])
+                    # Print node as S if start node
+                    if startNodeID == self.nodes[y][x].id:
+                        print("S")
+                    # Print node as G if goal node
+                    elif goalNodeID == self.nodes[y][x].id:
+                        print("G")
+                    # Print node as O if nothing special
+                    else:
+                        print("O")
