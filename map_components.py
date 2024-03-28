@@ -193,9 +193,9 @@ class Graph():
                 # Print node as G if goal node
                 elif goalNodeID == self.nodes[y][x].id:
                     print("G", end='')
-                # Print node as path node if on path
+                # Print node as X if on path
                 elif self.nodes[y][x].id in pathNodeIDs:
-                    print("P", end='')
+                    print("X", end='')
                 # Print node as O if nothing special
                 else:
                     print("O", end='')
