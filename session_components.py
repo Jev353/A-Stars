@@ -81,7 +81,11 @@ class AStar():
     
                     # Get and return the final path
                     return self.getPathFromGoalNode(neighbor)
-                # Goal not found
+                # Goal not found, bulding found
+                elif neighbor.isBuilding:
+                    # Can't go through building, just ignore
+                    continue
+                # Goal not found, normal buliding found
                 else:
                     # Calculate fScore for current path to neighbor
                     tempGScore: float = currentNode.gScore + edge.weight

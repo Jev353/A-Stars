@@ -19,11 +19,13 @@ class Node():
         
         self.parentID = self.id # The ID of the "parent" of this node. The parent represents the node
                                 # which comes before this node on a given A* path
-
-    ## Returns whether or not this node is a building
-    def isBuilding(self) -> bool:
-        return isinstance(self, BuildingNode)
+                                
+        self.isBuilding = False
     
+    ## Turns this node into a building
+    def makeBuilding(self) -> None:
+        self.isBuilding = True
+        
     ## Overrides less than or equal to
     def __le__(self, other):
         return self.fScore <= other.fScore
@@ -33,16 +35,16 @@ class Node():
         return self.fScore < other.fScore
     
 ### Represents a BuildingNode within the graph
-class BuildingNode(Node):
-    ## Constructor
-    def __init__(self, id: str, xCoordinate: int, yCoordinate: int, altitude: float, edges: list[Edge], name: str, address: str):
-        super().__init__(id, xCoordinate, yCoordinate, altitude, edges)
-        self.name = name
-        self.address = address
-    
-    ## Returns whether or not this node is a building
-    def isBuilding(self) -> bool:
-        super().isBuilding()
+#class BuildingNode(Node):
+#    ## Constructor
+#    def __init__(self, id: str, xCoordinate: int, yCoordinate: int, altitude: float, name: str, address: str):
+#        super().__init__(id, xCoordinate, yCoordinate, altitude)
+#        self.name = name
+#        self.address = address
+#   
+#    ## Returns whether or not this node is a building
+#    def isBuilding(self) -> bool:
+#       return True
 
 ### Represents an edge within the graph
 class Edge():
@@ -193,6 +195,9 @@ class Graph():
                 # Print node as G if goal node
                 elif goalNodeID == self.nodes[y][x].id:
                     print("G", end='')
+                # print node as B if building node
+                elif self.nodes[y][x].isBuilding:
+                    print("B", end='')
                 # Print node as X if on path
                 elif self.nodes[y][x].id in pathNodeIDs:
                     print("X", end='')
