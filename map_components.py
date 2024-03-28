@@ -187,34 +187,26 @@ class Graph():
         # Iterate through graph, printing each node
         for y in range(self.height):
             for x in range(self.width):
+                # Print node as S if start node
+                if startNodeID == self.nodes[y][x].id:
+                    print("S", end='')
+                # Print node as G if goal node
+                elif goalNodeID == self.nodes[y][x].id:
+                    print("G", end='')
+                # Print node as path node if on path
+                elif self.nodes[y][x].id in pathNodeIDs:
+                    print("P", end='')
+                # Print node as O if nothing special
+                else:
+                    print("O", end='')
+                    
                 # Add "--" to represent edge if not at end of row
                 if x < self.width - 1:
-                    # Print node as S if start node
-                    if startNodeID == self.nodes[y][x].id:
-                        print("S", end='-')
-                    # Print node as G if goal node
-                    elif goalNodeID == self.nodes[y][x].id:
-                        print("G", end='-')
-                    # Print node as path node if on path
-                    elif self.nodes[y][x].id in pathNodeIDs:
-                        print("P", end='-')
-                    # Print node as O if nothing special
-                    else:
-                        print("O", end='-')
+                    print("-", end='')
                 # Add newline if at end of row
                 else:
-                    # Print node as S if start node
-                    if startNodeID == self.nodes[y][x].id:
-                        print("S")
-                    # Print node as G if goal node
-                    elif goalNodeID == self.nodes[y][x].id:
-                        print("G")
-                    # Print node as path node if on path
-                    elif self.nodes[y][x].id in pathNodeIDs:
-                        print("P")
-                    # Print node as O if nothing special
-                    else:
-                        print("O")
+                    print()
+                    
         
     # Creates a deepcopy of this graph
     def getDeepCopy(self) -> Graph:
