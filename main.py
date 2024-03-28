@@ -9,12 +9,12 @@ def main():
     newGraph.printGraph()
     
     # Get start node coordinates
-    startX = int(input("Enter x coordinate of start node: "))
-    startY = int(input("Enter y coordinate of start node: "))
+    startX = int(input("Enter x coordinate of start node (0 indexed): "))
+    startY = int(input("Enter y coordinate of start node (0 indexed): "))
     
     # Get goal node coordinates
-    goalX = int(input("Enter x coordinate of goal node: "))
-    goalY = int(input("Enter y coordinate of goal node: "))
+    goalX = int(input("Enter x coordinate of goal node (0 indexed): "))
+    goalY = int(input("Enter y coordinate of goal node (0 indexed): "))
     
     # Get start node and goal node
     startNode: Node = newGraph.getNodeFromCoor(startY, startX)
