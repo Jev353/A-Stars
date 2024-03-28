@@ -184,6 +184,9 @@ class Graph():
             for edge in pathEdges:
                 for node in edge.nodes:
                     pathNodeIDs.append(node.id)
+            # If there are no edges on the path, then the start node and goal node must be the same
+            if len(pathEdges) == 0:
+                print("Start node and goal node are the same!")
                 
         
         # Iterate through graph, printing each node

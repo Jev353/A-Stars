@@ -39,6 +39,10 @@ class AStar():
     
     ## Returns a list of edges(?) which connect the startNode and endNode
     def generateRoutePath(self, graph: Graph, startNodeID: str, goalNodeID: str, avoidStairs: str=False, avoidSteepTerrain: str=False) -> list[Edge]:
+        # Return empty list if goal is start 
+        if startNodeID == goalNodeID:
+            return []
+        
         # Create a copy of the graph for use in finding path
         # (copy is needed so parent values get reset)
         self.copyGraph = graph.getDeepCopy()
