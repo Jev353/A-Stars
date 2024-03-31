@@ -13,7 +13,7 @@ def main():
     # Initialize active user object
     activeUser : User = loginMenu()
     # Get user decision
-    print("1: Generate graph for A*")
+    print("1: Generate A* path")
     print("2: Create schedule")
     print("3: Load schedule")
     userInput = input("Enter menu option: ")
@@ -73,20 +73,16 @@ def loginMenu() -> User:
 
 ## Prompts for a graph, start and goal nodes, and building nodes, then displays a route
 def basicPathfindingMenu() -> None:
-    # Get graph dimensions
-    width = int(input("Enter graph width: "))
-    height = int(input("Enter graph height: "))
-    
     # Get start node coordinates
-    startX = int(input("Enter x coordinate of start node (0 indexed): "))
-    startY = int(input("Enter y coordinate of start node (0 indexed): "))
+    startX = int(input("Enter x coordinate of start node (0 indexed, 20x20): "))
+    startY = int(input("Enter y coordinate of start node (0 indexed, 20x20): "))
     
     # Get goal node coordinates
-    goalX = int(input("Enter x coordinate of goal node (0 indexed): "))
-    goalY = int(input("Enter y coordinate of goal node (0 indexed): "))
+    goalX = int(input("Enter x coordinate of goal node (0 indexed, 20x20): "))
+    goalY = int(input("Enter y coordinate of goal node (0 indexed, 20x20): "))
     
     # Create graph
-    newGraph: Graph = Graph(width, height)
+    newGraph: Graph = Graph(20, 20)
     
     # Get start node and goal node
     startNode: Node = newGraph.getNodeFromCoor(startY, startX)

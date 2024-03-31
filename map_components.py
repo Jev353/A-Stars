@@ -49,7 +49,7 @@ class Node():
 ### Represents an edge within the graph
 class Edge():
     ## Constructor
-    def __init__(self, id: str, weight: int, isStair: bool, nodes: list[Node] = []):
+    def __init__(self, id: str, weight: int, nodes: list[Node] = [], isStair: bool = False, isSteepTerrain: bool = False):
         # TODO: Decide how we'll estimate time of edge
         self.id = id
         self.weight = weight
@@ -58,6 +58,7 @@ class Edge():
             raise Exception("Edge <" + id + "> is trying to connect " + len(nodes) + " nodes")
         
         self.isStair = isStair
+        self.isSteepTerrain = isSteepTerrain
         self.nodes = nodes
         self.elevationChange = abs(nodes[0].altitude - nodes[1].altitude)
         
@@ -147,14 +148,28 @@ class Graph():
             for x in range(width):
                 # Connect current node to node below it, if not at bottom of graph
                 if y < height - 1:
-                    newVerticalEdge = Edge(str(edgesMade), 1, False, [self.nodes[y][x], self.nodes[y+1][x]])
-                    self.nodes[y][x].edges.append(newVerticalEdge)
-                    self.nodes[y+1][x].edges.append(newVerticalEdge)
-                    edgesMade += 1
+                    # Make all edges connecting row 9 to row 10, barring the middle one, stairs
+                    if y == 9 and x != 9:
+                        newVerticalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y+1][x]], isStair = True, isSteepTerrain = False)
+                        self.nodes[y][x].edges.append(newVerticalEdge)
+                        self.nodes[y+1][x].edges.append(newVerticalEdge)
+                        edgesMade += 1
+                    # Make all edges connecting row 14 to row 15, barring the rightmost one, steep terrain
+                    elif y == 14 and x != 19:
+                        newVerticalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y+1][x]], isStair = False, isSteepTerrain = True)
+                        self.nodes[y][x].edges.append(newVerticalEdge)
+                        self.nodes[y+1][x].edges.append(newVerticalEdge)
+                        edgesMade += 1
+                    # Make all other nodes neither steep terrain nor stairs
+                    else:
+                        newVerticalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y+1][x]], isStair = False, isSteepTerrain = False)
+                        self.nodes[y][x].edges.append(newVerticalEdge)
+                        self.nodes[y+1][x].edges.append(newVerticalEdge)
+                        edgesMade += 1
                     
                 # Connect current node to node to its right, if not at right edge of graph
                 if x < width - 1:
-                    newHorizontalEdge = Edge(str(edgesMade), 1, False, [self.nodes[y][x], self.nodes[y][x+1]])
+                    newHorizontalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y][x+1]], isStair = False, isSteepTerrain = False)
                     self.nodes[y][x].edges.append(newHorizontalEdge)
                     self.nodes[y][x+1].edges.append(newHorizontalEdge)
                     edgesMade += 1
