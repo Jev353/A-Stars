@@ -47,6 +47,7 @@ def main():
         else:
             print("Account not found. Crashing.")
             return
+    # Neither input 'L' nor 'R'. Crash
     else:
         print("Invalid input. Crashing out of disrespect.")
         return
