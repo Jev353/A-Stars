@@ -20,9 +20,9 @@ def main():
     
     if (userInput == "1"):
         while True:
-            basicPathfindingMenu()
+            basicPathfindingMenu(activeUser)
     elif (userInput == "2"):
-        pass
+        createScheduleMenu(activeUser)
     elif (userInput == "3"):
         pass
     else:
@@ -40,13 +40,13 @@ def loginMenu() -> User:
         userInput = input("Please enter new username: ")
         
         # Verify that username is not taken
-        duplicateName = databaseCursor.execute("SELECT username FROM users WHERE username = %s;", (userInput,))
+        duplicateName = databaseCursor.execute("SELECT username FROM Users WHERE username = %s;", (userInput,))
         if duplicateName:
             print("This username is taken, and I can't be bothered to make this a loop. Goodbye!")
             exit()
         # Enter user into database
         else:
-            databaseCursor.execute("INSERT INTO users (username) VALUES (%s);", (userInput,))
+            databaseCursor.execute("INSERT INTO Users (username) VALUES (%s);", (userInput,))
             database.commit()
             print("Account Created!")
             return User(databaseCursor.lastrowid)
@@ -56,7 +56,7 @@ def loginMenu() -> User:
         userInput = input("Please enter your username: ")
         
         # Verify that account exists
-        databaseCursor.execute('SELECT userID FROM users WHERE username = %s;', (userInput,))
+        databaseCursor.execute('SELECT userID FROM Users WHERE username = %s;', (userInput,))
         userID = databaseCursor.fetchall()
         # Account found
         if userID:
@@ -71,8 +71,92 @@ def loginMenu() -> User:
         print("Invalid input. Crashing out of disrespect.")
         exit()
 
+## Prompts for schedule information, such as a name and route info
+def createScheduleMenu(activeUser : User) -> None:
+    # Prompt for name
+    newScheduleName = input("Please enter the schedule's name: ")
+    
+    # Get all schedules for current user
+    databaseCursor.execute("SELECT scheduleName FROM Schedules WHERE userID = %s;", (activeUser.id,))
+    
+    # Check to ensure the entered schedule name doesn't already exist
+    for scheduleName in databaseCursor:
+        if (scheduleName[0] == newScheduleName): ##TODO Ensure that iterating through databaseCursor like still removes the data from the cursor
+            print("That schedule name is taken!")
+            exit()
+            
+    # Commit schedule
+    databaseCursor.execute("INSERT INTO Schedules (userID, scheduleName) VALUES (%s, %s);", (activeUser.id, newScheduleName))
+    database.commit()
+    
+    # Get the ID of the just commited schedule
+    currentScheduleID = databaseCursor.lastrowid
+    
+    # Prompt for a route name, start time, and end time for a new route for this schedule
+    newScheduleRouteName = input("Please enter a route name for this schedule: ")
+    newScheduleRouteStartTime = input("Please enter a start time for this route (hh:mm): ")
+    newScheduleRouteEndTime = input("Please enter an end time for this route (hh:mm): ")
+    
+    # Prompt for start position of new route
+    startX = int(input("Enter x coordinate of start node (0 indexed, 20x20): "))
+    startY = int(input("Enter y coordinate of start node (0 indexed, 20x20): "))
+    
+    # Prompt for end position of new route
+    goalX = int(input("Enter x coordinate of goal node (0 indexed, 20x20): "))
+    goalY = int(input("Enter y coordinate of goal node (0 indexed, 20x20): "))
+    
+    # Create graph
+    newGraph: Graph = Graph(20, 20)
+    
+    # Get start node and goal node
+    startNode: Node = newGraph.getNodeFromCoor(startY, startX)
+    goalNode: Node = newGraph.getNodeFromCoor(goalY, goalX)
+    
+    # Get node IDs
+    startNodeID = startNode.id
+    goalNodeID = goalNode.id
+    
+    # Initialize filter variables
+    avoidStairs: bool = False
+    avoidSteepTerrain: bool = False
+
+    # Prompt user for stair avoidance option
+    userInput = input("Enter 'Y' to avoid stairs, or 'N' to use stairs: ").upper()
+    if userInput == "Y":
+        avoidStairs = True
+    
+    # Prompt user for steep terrain avoidance option
+    userInput = input("Enter 'Y' to avoid steep terrain, or 'N' to use steep terrain: ").upper()
+    if userInput == "Y":
+        avoidSteepTerrain = True
+    
+    # Create AStar instance
+    aStar = AStar()
+    
+    # Generate path
+    pathEdgesIDs: list[str] = aStar.generateRoutePath(newGraph, startNodeID, goalNodeID, avoidStairs, avoidSteepTerrain)
+    
+    # Ensure path was found
+    if pathEdgesIDs == None:
+        print("No route can be made between these two spots. Crashing.")
+        exit()
+    
+    # Commit new scheduleRoute
+    databaseCursor.execute("INSERT INTO ScheduleRoutes (scheduleID, scheduleRouteName, scheduleRouteStartTime, scheduleRouteEndTime) VALUES (%s, %s, %s, %s);", (currentScheduleID, newScheduleRouteName, newScheduleRouteStartTime, newScheduleRouteEndTime))
+    database.commit()
+    newScheduleRouteID = databaseCursor.lastrowid
+    
+    # Commit edges on the route
+    for edgeID in pathEdgesIDs:
+        databaseCursor.execute("INSERT INTO Edges (edgeActualID, scheduleRouteID) VALUES (%s, %s);", (edgeID, newScheduleRouteID))
+    database.commit()
+        
+    print("Schedule and Route created!")
+    
+    
+
 ## Prompts for a graph, start and goal nodes, and building nodes, then displays a route
-def basicPathfindingMenu() -> None:
+def basicPathfindingMenu(activeUser : User) -> None:
     # Get start node coordinates
     startX = int(input("Enter x coordinate of start node (0 indexed, 20x20): "))
     startY = int(input("Enter y coordinate of start node (0 indexed, 20x20): "))

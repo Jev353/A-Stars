@@ -89,7 +89,7 @@ class AStar():
         
         # Path was not found
         print("Path not found")
-        return
+        return None
                     
     ## Returns the heuristic value of the given node for the path's goal node
     def heuristicFunction(self, node: Node, goalNode: Node) -> float:
