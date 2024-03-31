@@ -2,7 +2,10 @@ from map_components import Graph
 from map_components import Edge
 from map_components import Node
 from session_components import AStar
-import session_components 
+
+from mysql_connector import databaseCursor
+
+import time
 
 def main():
     # Get graph dimensions
@@ -52,12 +55,22 @@ def main():
         
         # Print graph with new building node
         newGraph.printGraph(startNodeID=startNodeID, goalNodeID=goalNodeID)
-    
+
+    # Create AStar instance
     aStar = AStar()
+    
+    # Record time before route generation
+    start_time = time.perf_counter()
     
     pathEdges: list[Edge] = aStar.generateRoutePath(newGraph, startNodeID, goalNodeID)
     
+    # Record time taken to generate route
+    pathGenerateTime = time.perf_counter() - start_time
+    
+    # Print the graph with the path
     newGraph.printGraph(startNodeID=startNodeID, goalNodeID=goalNodeID, pathEdges=pathEdges)
     
+    # Print the time taken to generate the route
+    print("--- %s seconds ---" % (pathGenerateTime))
 
 main()
