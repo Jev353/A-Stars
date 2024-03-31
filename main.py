@@ -4,15 +4,20 @@ from map_components import Node
 from session_components import AStar
 from session_components import User
 
-from mysql_connector import databaseCursor
-from mysql_connector import database        #TODO This might be slow.  Maybe we set a variable equal to dataBase cursor and another to dataBase
+from database_connector import databaseCursor
+from database_connector import database        #TODO This might be slow.  Maybe we set a variable equal to dataBase cursor and another to dataBase
 
 import time
 
 def main():
     # Initialize active user object
-    activeUser : User = None
-    
+    activeUser : User = loginMenu()
+    # Do this forever
+    while True:
+        basicPathfindingMenu()
+
+## Startup menu for logging in. Returns a User representing the logged in user
+def loginMenu() -> User:
     # Prompt for login or register
     userInput = input("Enter L to login, and R to register: ").upper()
     
@@ -25,34 +30,36 @@ def main():
         duplicateName = databaseCursor.execute("SELECT username FROM users WHERE username = %s;", (userInput,))
         if duplicateName:
             print("This username is taken, and I can't be bothered to make this a loop. Goodbye!")
-            return
+            exit()
         # Enter user into database
         else:
             databaseCursor.execute("INSERT INTO users (username) VALUES (%s);", (userInput,))
             database.commit()
-            activeUser = User(databaseCursor.lastrowid)
             print("Account Created!")
+            return User(databaseCursor.lastrowid)
     # Login to existing account
     elif userInput == "L":
-        # Prompt and get username
+        # Prompt for username
         userInput = input("Please enter your username: ")
+        
+        # Verify that account exists
         databaseCursor.execute('SELECT userID FROM users WHERE username = %s;', (userInput,))
         userID = databaseCursor.fetchall()
-        
         # Account found
         if userID:
-            activeUser = User(userID[0][0])
-            print("Account found!")
+            print("Account found!") 
+            return User(userID[0][0])
         # Account not found
         else:
             print("Account not found. Crashing.")
-            return
+            exit()
     # Neither input 'L' nor 'R'. Crash
     else:
         print("Invalid input. Crashing out of disrespect.")
-        return
-            
-    
+        exit()
+
+## Prompts for a graph, start and goal nodes, and building nodes, then displays a route
+def basicPathfindingMenu() -> None:
     # Get graph dimensions
     width = int(input("Enter graph width: "))
     height = int(input("Enter graph height: "))
@@ -117,5 +124,6 @@ def main():
     
     # Print the time taken to generate the route
     print("--- %s seconds ---" % (pathGenerateTime))
-
+    
+    
 main()
