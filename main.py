@@ -117,13 +117,27 @@ def basicPathfindingMenu() -> None:
         # Print graph with new building node
         newGraph.printGraph(startNodeID=startNodeID, goalNodeID=goalNodeID)
 
+    # Initialize filter variables
+    avoidStairs: bool = False
+    avoidSteepTerrain: bool = False
+
+    # Prompt user for stair avoidance option
+    userInput = input("Enter 'Y' to avoid stairs, or 'N' to use stairs: ").upper()
+    if userInput == "Y":
+        avoidStairs = True
+    
+    # Prompt user for steep terrain avoidance option
+    userInput = input("Enter 'Y' to avoid steep terrain, or 'N' to use steep terrain: ").upper()
+    if userInput == "Y":
+        avoidSteepTerrain = True
+    
     # Create AStar instance
     aStar = AStar()
     
     # Record time before route generation
     start_time = time.perf_counter()
     
-    pathEdges: list[Edge] = aStar.generateRoutePath(newGraph, startNodeID, goalNodeID)
+    pathEdges: list[Edge] = aStar.generateRoutePath(newGraph, startNodeID, goalNodeID, avoidStairs, avoidSteepTerrain)
     
     # Record time taken to generate route
     pathGenerateTime = time.perf_counter() - start_time

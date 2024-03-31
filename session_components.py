@@ -11,7 +11,7 @@ class AStar():
     def __init__(self):
         pass
     
-    ## Returns a list of edges(?) which connect the startNode and endNode
+    ## Returns a list of edges which connect the startNode and endNode
     def generateRoutePath(self, graph: Graph, startNodeID: str, goalNodeID: str, avoidStairs: str=False, avoidSteepTerrain: str=False) -> list[Edge]:
         # Return empty list if goal is start 
         if startNodeID == goalNodeID:
@@ -48,9 +48,16 @@ class AStar():
             visitedNodes.append(currentNode)
             
             # Iterate through edges
-            for edge in currentNode.edges:
+            for currentEdge in currentNode.edges:
+                # Go to next edge if currenteEdge is a stair and user wants to avoid stairs
+                if currentEdge.isStair and avoidStairs:
+                    continue
+                # Go to next edge if currenteEdge is steep terrain and user wants to avoid steep terrain
+                if currentEdge.isSteepTerrain and avoidSteepTerrain:
+                    continue
+                
                 # Get neighbor that the current edge connects to
-                neighbor: Node = edge.getOtherNode(currentNode)
+                neighbor: Node = currentEdge.getOtherNode(currentNode)
                 
                 # Goal found!!!
                 if neighbor == goalNode:
@@ -66,7 +73,7 @@ class AStar():
                 # Goal not found, normal buliding found
                 else:
                     # Calculate fScore for current path to neighbor
-                    tempGScore: float = currentNode.gScore + edge.weight
+                    tempGScore: float = currentNode.gScore + currentEdge.weight
                     tempHScore: float = self.heuristicFunction(neighbor, goalNode)
                     tempFScore: float = tempGScore + tempHScore
                     
