@@ -12,7 +12,7 @@ class AStar():
         pass
     
     ## Returns a list of edges which connect the startNode and endNode
-    def generateRoutePath(self, graph: Graph, startNodeID: str, goalNodeID: str, avoidStairs: str=False, avoidSteepTerrain: str=False) -> list[Edge]:
+    def generateRoutePath(self, graph: Graph, startNodeID: str, goalNodeID: str, avoidStairs: str=False, avoidSteepTerrain: str=False) -> list[str]:
         # Return empty list if goal is start 
         if startNodeID == goalNodeID:
             return []
@@ -101,8 +101,8 @@ class AStar():
     
     ## Returns list of edges that form found path
     def getPathFromGoalNode(self, goalNode: Node):
-        # Initialize edge list
-        edges : list[Edge] = []
+        # Initialize list of edge IDs
+        edgeIDs : list[str] = []
         
         # Initialize currentNode as goalNode
         currentNode : Node = goalNode
@@ -112,15 +112,15 @@ class AStar():
             # Get the edge that connects these two nodes
             for edge in currentNode.edges:
                 if edge.getOtherNode(currentNode).id == currentNode.parentID:
-                    # Add edge to list
-                    edges.append(edge)
+                    # Add edge id to list
+                    edgeIDs.append(edge.id)
                     
                     # Update current node
                     currentNode = self.copyGraph.getNodeFromID(currentNode.parentID)
                     break
         
         # All edges have been added, since entire path has been traversed backwards
-        return edges
+        return edgeIDs
                 
 
 ### Represents a user

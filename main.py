@@ -137,13 +137,13 @@ def basicPathfindingMenu() -> None:
     # Record time before route generation
     start_time = time.perf_counter()
     
-    pathEdges: list[Edge] = aStar.generateRoutePath(newGraph, startNodeID, goalNodeID, avoidStairs, avoidSteepTerrain)
+    pathEdgesIDs: list[str] = aStar.generateRoutePath(newGraph, startNodeID, goalNodeID, avoidStairs, avoidSteepTerrain)
     
     # Record time taken to generate route
     pathGenerateTime = time.perf_counter() - start_time
     
     # Print the graph with the path
-    newGraph.printGraph(startNodeID=startNodeID, goalNodeID=goalNodeID, pathEdges=pathEdges)
+    newGraph.printGraph(startNodeID=startNodeID, goalNodeID=goalNodeID, pathEdgesIDs=pathEdgesIDs)
     
     # Print the time taken to generate the route
     print("--- %s seconds ---" % (pathGenerateTime))

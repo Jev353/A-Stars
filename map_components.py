@@ -114,6 +114,7 @@ class Graph():
     ## Constructor
     def __init__(self, width: int, height: int, copy: bool = False, nodesToCopy: list[list[Node]] = None):
         self.nodes: list[list[Node]] = [[]] # 2D list of nodes
+        self.edges: list[Edge] = [] # List of edges
         self.width = width
         self.height = height
         
@@ -153,18 +154,21 @@ class Graph():
                         newVerticalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y+1][x]], isStair = True, isSteepTerrain = False)
                         self.nodes[y][x].edges.append(newVerticalEdge)
                         self.nodes[y+1][x].edges.append(newVerticalEdge)
+                        self.edges.append(newVerticalEdge)
                         edgesMade += 1
                     # Make all edges connecting row 14 to row 15, barring the rightmost one, steep terrain
                     elif y == 14 and x != 19:
                         newVerticalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y+1][x]], isStair = False, isSteepTerrain = True)
                         self.nodes[y][x].edges.append(newVerticalEdge)
                         self.nodes[y+1][x].edges.append(newVerticalEdge)
+                        self.edges.append(newVerticalEdge)
                         edgesMade += 1
                     # Make all other nodes neither steep terrain nor stairs
                     else:
                         newVerticalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y+1][x]], isStair = False, isSteepTerrain = False)
                         self.nodes[y][x].edges.append(newVerticalEdge)
                         self.nodes[y+1][x].edges.append(newVerticalEdge)
+                        self.edges.append(newVerticalEdge)
                         edgesMade += 1
                     
                 # Connect current node to node to its right, if not at right edge of graph
@@ -172,6 +176,7 @@ class Graph():
                     newHorizontalEdge = Edge(str(edgesMade), 1, [self.nodes[y][x], self.nodes[y][x+1]], isStair = False, isSteepTerrain = False)
                     self.nodes[y][x].edges.append(newHorizontalEdge)
                     self.nodes[y][x+1].edges.append(newHorizontalEdge)
+                    self.edges.append(newHorizontalEdge)
                     edgesMade += 1
             
     ## Gets the node at (xCoor, yCoor)
@@ -189,18 +194,26 @@ class Graph():
         # If we've reached here, the node wasn't found. Return None
         return None
     
+    ## Gets the edge with id "edgeID"
+    def getEdgeFromID(self, edgeID: str):
+        for edge in self.edges:
+            if edge.id == edgeID:
+                return edge
+    
     ## Prints the graph to the console
-    def printGraph(self, startNodeID: str = None, goalNodeID: str = None, pathEdges: list[Edge] = None):
+    def printGraph(self, startNodeID: str = None, goalNodeID: str = None, pathEdgesIDs: list[str] = None):
         # Initialize pathNodes list
         pathNodeIDs: list[Node] = []
         
-        # If list of edges was passed, get the nodes that those edges connect
-        if pathEdges != None:
-            for edge in pathEdges:
+        # If list of edge IDs was passed, get the nodes that those edges connect
+        if pathEdgesIDs != None:
+            for edgeID in pathEdgesIDs:
+                edge = self.getEdgeFromID(edgeID)
+                
                 for node in edge.nodes:
                     pathNodeIDs.append(node.id)
             # If there are no edges on the path, then the start node and goal node must be the same
-            if len(pathEdges) == 0:
+            if len(pathEdgesIDs) == 0:
                 print("Start node and goal node are the same!")
                 
         
