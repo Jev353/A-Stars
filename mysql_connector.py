@@ -1,7 +1,7 @@
 import mysql.connector
 
 # Connect to database
-dataBase = mysql.connector.connect(
+database = mysql.connector.connect(
     host="localhost",
     port="3307",
     user="root",
@@ -10,4 +10,4 @@ dataBase = mysql.connector.connect(
 )
 
 # Get cursor for database
-databaseCursor = dataBase.cursor(buffered=True)
+databaseCursor = database.cursor(buffered=True)

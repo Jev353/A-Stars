@@ -2,12 +2,56 @@ from map_components import Graph
 from map_components import Edge
 from map_components import Node
 from session_components import AStar
+from session_components import User
 
 from mysql_connector import databaseCursor
+from mysql_connector import database        #TODO This might be slow.  Maybe we set a variable equal to dataBase cursor and another to dataBase
 
 import time
 
 def main():
+    # Initialize active user object
+    activeUser : User = None
+    
+    # Prompt for login or register
+    userInput = input("Enter L to login, and R to register: ").upper()
+    
+    # Register new user
+    if userInput == "R":
+        # Prompt for desired username
+        userInput = input("Please enter new username: ")
+        
+        # Verify that username is not taken
+        duplicateName = databaseCursor.execute("SELECT username FROM users WHERE username = %s;", (userInput,))
+        if duplicateName:
+            print("This username is taken, and I can't be bothered to make this a loop. Goodbye!")
+            return
+        # Enter user into database
+        else:
+            databaseCursor.execute("INSERT INTO users (username) VALUES (%s);", (userInput,))
+            database.commit()
+            activeUser = User(databaseCursor.lastrowid)
+            print("Account Created!")
+    # Login to existing account
+    elif userInput == "L":
+        # Prompt and get username
+        userInput = input("Please enter your username: ")
+        databaseCursor.execute('SELECT userID FROM users WHERE username = %s;', (userInput,))
+        userID = databaseCursor.fetchall()
+        
+        # Account found
+        if userID:
+            activeUser = User(userID[0][0])
+            print("Account found!")
+        # Account not found
+        else:
+            print("Account not found. Crashing.")
+            return
+    else:
+        print("Invalid input. Crashing out of disrespect.")
+        return
+            
+    
     # Get graph dimensions
     width = int(input("Enter graph width: "))
     height = int(input("Enter graph height: "))

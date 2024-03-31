@@ -145,6 +145,6 @@ class AStar():
 ### Represents a user
 class User():
     ## Constructor
-    def __init__(self, id: str, schedules: list[Schedule]):
+    def __init__(self, id: str, schedules: list[Schedule] = None):
         self.id = id
         self.schedules = schedules
