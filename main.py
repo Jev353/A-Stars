@@ -12,9 +12,22 @@ import time
 def main():
     # Initialize active user object
     activeUser : User = loginMenu()
-    # Do this forever
-    while True:
-        basicPathfindingMenu()
+    # Get user decision
+    print("1: Generate graph for A*")
+    print("2: Create schedule")
+    print("3: Load schedule")
+    userInput = input("Enter menu option: ")
+    
+    if (userInput == "1"):
+        while True:
+            basicPathfindingMenu()
+    elif (userInput == "2"):
+        pass
+    elif (userInput == "3"):
+        pass
+    else:
+        print("Invalid input.")
+        exit()
 
 ## Startup menu for logging in. Returns a User representing the logged in user
 def loginMenu() -> User:
