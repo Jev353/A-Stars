@@ -1,9 +1,41 @@
 from map_components import Node
 from map_components import Edge
-from map_components import Schedule
 from map_components import Graph
+from datetime import datetime
 
 from queue import PriorityQueue
+
+### Represents a route    
+class Route():
+    ## Constructor
+    def __init__(self, startNodeID: str, endNodeID: str, avoidStairs: bool=False, avoidSteepTerrain: bool=False):
+        ## TODO: This requires A*. We'll pass the startNodeID, endNodeID, and settings
+        ## to A* which'll return a list of edges, which will become the self.edges var below
+        # edges = AStar.generateRoutePath(startNodeID, endNodeID, avoidStairs, avoidSteepTerrain)
+        pass
+        
+### Represents a route that is specifically saved to a schedule
+class ScheduleRoute(Route):
+    ## Constructor
+    def __init__(self, ID: str, scheduleID: str, name: str, startTime: datetime, endTime: datetime, edges: list[Edge]):
+        self.ID = ID
+        self.scheduleID = scheduleID
+        self.name = name
+        self.startTime = startTime
+        self.endTime = endTime
+        self.edges = edges
+        
+### Represents a schedule
+class Schedule():
+    ## Constructor
+    def __init__(self, ID: str, name: str, scheduleRoutes: list[ScheduleRoute]):
+        self.ID = ID
+        self.name = name
+        self.scheduleRoutes = scheduleRoutes
+        
+    ## Adds the given ScheduleRoute to this Schedule's scheduleRoutes
+    def addScheduleRoute(self, scheduleRoute: ScheduleRoute):
+        self.scheduleRoutes.append(scheduleRoute)
 
 ### Used to generate routes via A*
 class AStar():
@@ -122,7 +154,6 @@ class AStar():
         # All edges have been added, since entire path has been traversed backwards
         return edgeIDs
                 
-
 ### Represents a user
 class User():
     ## Constructor

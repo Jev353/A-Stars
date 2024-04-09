@@ -1,5 +1,4 @@
 from __future__ import annotations
-from datetime import datetime
 from copy import deepcopy
 
 ### Represents a node within the graph
@@ -74,39 +73,7 @@ class Edge():
             raise Exception("Edge <" + self.ID + "> connects node <" + firstNode.ID + "> to itself.")
         else:
             raise Exception("Node <" + firstNode.ID + "> is not linked to edge <" + self.ID + ">")
-               
-### Represents a route    
-class Route():
-    ## Constructor
-    def __init__(self, startNodeID: str, endNodeID: str, avoidStairs: bool=False, avoidSteepTerrain: bool=False):
-        ## TODO: This requires A*. We'll pass the startNodeID, endNodeID, and settings
-        ## to A* and it'll return a list of nodes, which will be the route's "edges" var
-        pass
-        # edges = AStar.generateRoutePath(startNodeID, endNodeID, avoidStairs, avoidSteepTerrain)
-        
-### Represents a route that is specifically saved to a schedule
-class ScheduleRoute(Route):
-    ## Constructor
-    def __init__(self, ID: str, scheduleID: str, name: str, startTime: datetime, endTime: datetime, edges: list[Edge]):
-        self.ID = ID
-        self.scheduleID = scheduleID
-        self.name = name
-        self.startTime = startTime
-        self.endTime = endTime
-        self.edges = edges
-        
-### Represents a schedule
-class Schedule():
-    ## Constructor
-    def __init__(self, ID: str, name: str, scheduleRoutes: list[ScheduleRoute]):
-        self.ID = ID
-        self.name = name
-        self.scheduleRoutes = scheduleRoutes
-        
-    ## Adds the given ScheduleRoute to this Schedule's scheduleRoutes
-    def addScheduleRoute(self, scheduleRoute: ScheduleRoute):
-        self.scheduleRoutes.append(scheduleRoute)
-        
+                  
 ### Represents a graph
 class Graph():
     ## Constructor
