@@ -61,8 +61,8 @@ class AStar():
                 
                 # Goal found!!!
                 if neighbor == goalNode:
-                    # Set the neighbor (goal)'s parent as the current node's id
-                    neighbor.parentID = currentNode.id
+                    # Set the neighbor (goal)'s parent as the current node's ID
+                    neighbor.parentID = currentNode.ID
     
                     # Get and return the final path
                     return self.getPathFromGoalNode(neighbor)
@@ -83,7 +83,7 @@ class AStar():
                         neighbor.gScore = tempGScore
                         neighbor.hScore = tempHScore
                         neighbor.fScore = tempFScore
-                        neighbor.parentID = currentNode.id
+                        neighbor.parentID = currentNode.ID
                         
                         nodesToVisit.put((neighbor.fScore, neighbor))
         
@@ -108,12 +108,12 @@ class AStar():
         currentNode : Node = goalNode
         
         # Go through chain of parents
-        while currentNode.id != currentNode.parentID:
+        while currentNode.ID != currentNode.parentID:
             # Get the edge that connects these two nodes
             for edge in currentNode.edges:
-                if edge.getOtherNode(currentNode).id == currentNode.parentID:
-                    # Add edge id to list
-                    edgeIDs.append(edge.id)
+                if edge.getOtherNode(currentNode).ID == currentNode.parentID:
+                    # Add edge ID to list
+                    edgeIDs.append(edge.ID)
                     
                     # Update current node
                     currentNode = self.copyGraph.getNodeFromID(currentNode.parentID)
@@ -126,6 +126,6 @@ class AStar():
 ### Represents a user
 class User():
     ## Constructor
-    def __init__(self, id: str, schedules: list[Schedule] = None):
-        self.id = id
+    def __init__(self, ID: str, schedules: list[Schedule] = None):
+        self.ID = ID
         self.schedules = schedules
