@@ -44,6 +44,9 @@ def mainMenu():
 
 ## Startup menu for logging in. Returns a User representing the logged in user
 def loginMenu() -> User:
+    global database
+    global databaseCursor
+    
     # Prompt for login or register
     userInput = input("Enter L to login, and R to register: ").upper()
     
@@ -64,6 +67,8 @@ def loginMenu() -> User:
         # Prompt for username
         userInput = input("Please enter your username: ")
         
+        reconnect()
+        
         # Verify that account exists
         databaseCursor.execute('SELECT userID FROM Users WHERE username = %s;', (userInput,))
         userID = databaseCursor.fetchall()
@@ -82,6 +87,10 @@ def loginMenu() -> User:
 
 ## Prompts for schedule information and adds a new schedule to the database
 def createScheduleMenu(activeUser: User) -> None:
+    
+    global databaseCursor
+    global database
+    
     # Prompt for name
     newScheduleName = input("Please enter the schedule's name: ")
     
@@ -102,6 +111,8 @@ def createScheduleMenu(activeUser: User) -> None:
         newScheduleRouteName = input("Please enter the name of a ScheduleRoute to add to this schedule (or N to stop adding routes): ")
         if (newScheduleRouteName == "N" or newScheduleRouteName == "n"):
             break
+        
+        reconnect()
         
         # Ensure Schedule doesn't already have a ScheduleRoute with the chosen name
         databaseCursor.execute("SELECT * FROM ScheduleRoutes WHERE scheduleID = %s AND scheduleRouteName = %s;", (newScheduleID, newScheduleRouteName))
@@ -140,9 +151,27 @@ def createScheduleMenu(activeUser: User) -> None:
         newScheduleRouteID = addNewScheduleRouteToSchedule(graph, newScheduleID, newScheduleRouteName, startNodeID, goalNodeID, newScheduleRouteStartTime, newScheduleRouteEndTime, avoidStairs, avoidSteepTerrain)
         
         # Ensure ScheduleRoute was created
-        if newScheduleRouteID == -1:
-            print("Could not create schedule route. Path not found.")
-            return
+        while newScheduleRouteID == -1:
+            try:
+                # Reconnect, try again
+                database = mysql.connector.connect(
+                    host="srv872.hstgr.io",
+                    port="3306",
+                    user="u425992461_WalkEaseRoot",
+                    passwd="<>UnH^ackable@@@6",
+                    database="u425992461_WalkEase",
+                    connection_timeout=3600
+                )
+
+                # Get cursor for database
+                databaseCursor = database.cursor(buffered=True)
+
+                # Update max execution time to 10 seconds
+                databaseCursor.execute("SET SESSION MAX_STATEMENT_TIME=10000")
+                
+                newScheduleRouteID = addNewScheduleRouteToSchedule(graph, newScheduleID, newScheduleRouteName, startNodeID, goalNodeID, newScheduleRouteStartTime, newScheduleRouteEndTime, avoidStairs, avoidSteepTerrain)
+            except:
+                continue
         
         # Success message
         print("Route created!")

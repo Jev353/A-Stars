@@ -12,21 +12,29 @@ from datetime import datetime
 
 # Connect to database
 database = mysql.connector.connect(
-    host="localhost",
-    port="3307",
-    user="root",
-    passwd="SuperSecret@#5@",
-    database="walkease"
+    host="srv872.hstgr.io",
+    port="3306",
+    user="u425992461_WalkEaseRoot",
+    passwd="<>UnH^ackable@@@6",
+    database="u425992461_WalkEase",
+    connection_timeout=3600
 )
 
 # Get cursor for database
 databaseCursor = database.cursor(buffered=True)
+
+# Update max execution time to 10 seconds
+databaseCursor.execute("SET SESSION MAX_STATEMENT_TIME=10000")
 
 ### Functions for common database queries
 ## Returns a list of Schedules belonging to a given User
 #param userID: the ID of the User to get the Schedules of
 #returns a list of Schedules belonging to the given User 
 def getUserSchedules(userID: str) -> list[Schedule]:
+    global databaseCursor
+    
+    reconnect()
+    
     # Get all schedules for this user
     databaseCursor.execute("SELECT scheduleID, scheduleName FROM Schedules WHERE userID = %s;", (userID,))
     scheduleInfos = databaseCursor.fetchall()
@@ -46,6 +54,10 @@ def getUserSchedules(userID: str) -> list[Schedule]:
 #param scheduleID: the ID of the Schedule to get the ScheduleRoutes of
 #returns a list of ScheduleRoutes belonging to the given Schedule
 def getScheduleRoutesInSchedule(scheduleID: str):
+    global databaseCursor
+    
+    reconnect()
+    
     # Get all ScheduleRoutes for this Schedule
     databaseCursor.execute("SELECT scheduleRouteID, scheduleID, scheduleRouteName, scheduleRouteStartTime, scheduleRouteEndTime FROM ScheduleRoutes WHERE scheduleID = %s;", (scheduleID,))
     scheduleRoutesInfos = databaseCursor.fetchall()
@@ -68,6 +80,10 @@ def getScheduleRoutesInSchedule(scheduleID: str):
 #param scheduleRouteID: the ID of the ScheduleRoute to get the Edges of
 #returns a list of Edges belonging to the given ScheduleRoute
 def getEdgesInScheduleRoute(scheduleRouteID: str) -> list[Edge]:
+    global databaseCursor
+
+    reconnect()
+
     # Get all Edges for this ScheduleRoute
     databaseCursor.execute("SELECT edgeActualID, scheduleRouteID FROM Edges WHERE scheduleRouteID = %s;", (scheduleRouteID,))
     edgesInfos = databaseCursor.fetchall()
@@ -87,6 +103,10 @@ def getEdgesInScheduleRoute(scheduleRouteID: str) -> list[Edge]:
 #param username: the requested username
 #returns -1 if the username is taken, and the new User's ID (as a string) if not
 def addNewUser(username: str):
+    global databaseCursor
+    
+    reconnect()
+    
     # Verify that username is not taken
     databaseCursor.execute("SELECT username FROM Users WHERE username = %s;", (username,))
     duplicateName = databaseCursor.fetchall()
@@ -95,6 +115,8 @@ def addNewUser(username: str):
         return -1
     # Enter user into database
     else:
+        reconnect()
+        
         databaseCursor.execute("INSERT INTO Users (username) VALUES (%s);", (username,))
         database.commit()
         return str(databaseCursor.lastrowid)
@@ -104,9 +126,13 @@ def addNewUser(username: str):
 #param scheduleName: the name of the Schedule we're adding
 #returns -1 if the Schedule can't be created, and the ID (str) of the new Schedule otherwise
 def addNewScheduleToUserAccount(userID: str, scheduleName: str):
+    global databaseCursor
+    
     # Ensure the user doesn't already have a schedule with that name
     if copyExists("Schedules", "scheduleName", userID, scheduleName):
         return -1
+            
+    reconnect()
             
     # Commit schedule
     databaseCursor.execute("INSERT INTO Schedules (userID, scheduleName) VALUES (%s, %s);", (userID, scheduleName))
@@ -128,6 +154,8 @@ def addNewScheduleToUserAccount(userID: str, scheduleName: str):
 #returns -1 if a route could not be found, and the ID (str) of the new ScheduleRoute otherwise
 def addNewScheduleRouteToSchedule(graph: Graph, scheduleID: str, scheduleRouteName: str, startNodeID: str, goalNodeID: str, startTime: str, endTime: str, 
                                   avoidStairs: bool = False, avoidSteepTerrain: bool = False):
+    global databaseCursor
+    
     # Create AStar instance
     aStar = AStar()
     
@@ -138,6 +166,8 @@ def addNewScheduleRouteToSchedule(graph: Graph, scheduleID: str, scheduleRouteNa
     if pathEdgesIDs == None:
         return -1
     
+    reconnect()
+    
     # Commit new scheduleRoute
     databaseCursor.execute("INSERT INTO ScheduleRoutes (scheduleID, scheduleRouteName, scheduleRouteStartTime, scheduleRouteEndTime) VALUES (%s, %s, %s, %s);", (scheduleID, scheduleRouteName, datetime.strptime(startTime, '%H:%M'), datetime.strptime(endTime, '%H:%M')))
     database.commit()
@@ -147,6 +177,7 @@ def addNewScheduleRouteToSchedule(graph: Graph, scheduleID: str, scheduleRouteNa
     
     # Commit the edges on the generated route
     for edgeID in pathEdgesIDs:
+        reconnect() #TODO Move outside the loop?
         databaseCursor.execute("INSERT INTO Edges (edgeActualID, scheduleRouteID) VALUES (%s, %s);", (edgeID, newScheduleRouteID))
         
     database.commit()
@@ -160,6 +191,10 @@ def addNewScheduleRouteToSchedule(graph: Graph, scheduleID: str, scheduleRouteNa
 #param newValue: the value to ensure doesn't exist in the table
 #returns False if a copy does not exist, and True if one does exist
 def copyExists(table: str, attribute: str, userID: str, newValue: str) -> bool:
+    global databaseCursor
+    
+    reconnect()
+    
     # Get all of the attribute values associated with this user
     databaseCursor.execute("SELECT * FROM `{}` WHERE userID = %s AND `{}` = %s;".format(table, attribute), (userID, newValue))
     duplicateValue = databaseCursor.fetchall()
@@ -170,3 +205,26 @@ def copyExists(table: str, attribute: str, userID: str, newValue: str) -> bool:
             
     # No copy exists, return False
     return False
+
+def reconnect():
+    global database
+    global databaseCursor
+    
+    try:
+        databaseCursor.execute("SELECT 1;")
+    except:
+        print("Reconnecting...")
+        database = mysql.connector.connect(
+            host="srv872.hstgr.io",
+            port="3306",
+            user="u425992461_WalkEaseRoot",
+            passwd="<>UnH^ackable@@@6",
+            database="u425992461_WalkEase",
+            connection_timeout=3600
+        )
+
+        # Get cursor for database
+        databaseCursor = database.cursor(buffered=True)
+
+        # Update max execution time to 10 seconds
+        databaseCursor.execute("SET SESSION MAX_STATEMENT_TIME=10000")
