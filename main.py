@@ -67,15 +67,12 @@ def loginMenu() -> User:
         # Prompt for username
         userInput = input("Please enter your username: ")
         
-        reconnect()
+        user = getUserFromUsername(userInput)
         
-        # Verify that account exists
-        databaseCursor.execute('SELECT userID FROM Users WHERE username = %s;', (userInput,))
-        userID = databaseCursor.fetchall()
         # Account found
-        if userID:
+        if user != None:
             print("Account found!") 
-            return User(str(userID[0][0]))
+            return user
         # Account not found
         else:
             print("Account not found. Crashing.")

@@ -7,6 +7,7 @@ from session_components import Route
 from session_components import ScheduleRoute
 from session_components import Schedule
 from session_components import AStar
+from session_components import User
 
 from datetime import datetime
 
@@ -27,6 +28,23 @@ databaseCursor = database.cursor(buffered=True)
 databaseCursor.execute("SET SESSION MAX_STATEMENT_TIME=10000")
 
 ### Functions for common database queries
+## Returns a User object if an account is found with the given username
+#param username: the username to check the database for
+#returns a User object coorelating to the given username, or None if the username wasn't found in the database
+def getUserFromUsername(username: str) -> User:
+    reconnect()
+    
+    # Verify that account exists
+    databaseCursor.execute('SELECT userID FROM Users WHERE username = %s;', (username,))
+    userID = databaseCursor.fetchall()
+    
+    # Account found
+    if userID:
+        return User(str(userID[0][0]))
+    # Account not found
+    else:
+        return None
+
 ## Returns a list of Schedules belonging to a given User
 #param userID: the ID of the User to get the Schedules of
 #returns a list of Schedules belonging to the given User 
@@ -81,7 +99,6 @@ def getScheduleRoutesInSchedule(scheduleID: str):
 #returns a list of Edges belonging to the given ScheduleRoute
 def getEdgesInScheduleRoute(scheduleRouteID: str) -> list[Edge]:
     global databaseCursor
-
     reconnect()
 
     # Get all Edges for this ScheduleRoute
@@ -104,7 +121,6 @@ def getEdgesInScheduleRoute(scheduleRouteID: str) -> list[Edge]:
 #returns -1 if the username is taken, and the new User's ID (as a string) if not
 def addNewUser(username: str):
     global databaseCursor
-    
     reconnect()
     
     # Verify that username is not taken
@@ -206,6 +222,7 @@ def copyExists(table: str, attribute: str, userID: str, newValue: str) -> bool:
     # No copy exists, return False
     return False
 
+## Runs a no-op to test connection, and then reconnects if necessary
 def reconnect():
     global database
     global databaseCursor
