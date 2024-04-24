@@ -1,5 +1,5 @@
-# wsu-campus-walking-gps
-## This is a GPS mobile application mapping Washington State University's Pullman campus.
+# wsu-campus-walking-route-plotter
+## This is a route plotter mobile application mapping Washington State University's Pullman campus.
 ### Description
 This application is designed to provide students at Washington State University with a helpful map and route plotter, to help guide them as they walk along the Pullman campus, looking for the correct building for which their classes are being held.
 ### Collaborators
