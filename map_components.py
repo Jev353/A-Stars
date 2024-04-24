@@ -146,11 +146,11 @@ class Graph():
                     edgesMade += 1
             
     ## Gets the node at (xCoor, yCoor)
-    def getNodeFromCoor(self, yCoor: int, xCoor: int):
+    def getNodeFromCoor(self, yCoor: int, xCoor: int) -> Node:
         return self.nodes[yCoor][xCoor]
     
     ## Gets the node with ID "nodeID"
-    def getNodeFromID(self, nodeID: str):
+    def getNodeFromID(self, nodeID: str) -> Node:
         # Iterate through all nodes until node is found
         for y in range(self.height):
             for x in range(self.width):
@@ -161,13 +161,13 @@ class Graph():
         return None
     
     ## Gets the edge with ID "edgeID"
-    def getEdgeFromID(self, edgeID: str):
+    def getEdgeFromID(self, edgeID: str) -> Edge:
         for edge in self.edges:
             if edge.ID == edgeID:
                 return edge
     
     ## Prints the graph to the console
-    def printGraph(self, startNodeID: str = None, goalNodeID: str = None, pathEdgesIDs: list[str] = None):
+    def printGraph(self, startNodeID: str = None, goalNodeID: str = None, pathEdgesIDs: list[str] = None) -> None:
         # Initialize pathNodes list
         pathNodeIDs: list[Node] = []
         
