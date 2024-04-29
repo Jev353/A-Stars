@@ -1,5 +1,7 @@
 from __future__ import annotations
 from copy import deepcopy
+import csv
+import os
 
 ### Represents a node within the graph
 class Node():
@@ -77,85 +79,95 @@ class Edge():
 ### Represents a graph
 class Graph():
     ## Constructor
-    def __init__(self, width: int, height: int, copy: bool = False, nodesToCopy: list[list[Node]] = None, edgesToCopy: list[Edge] = None):
-        self.nodes: list[list[Node]] = [[]] # 2D list of nodes
+    def __init__(self, width: int, height: int, copy: bool = False, nodesToCopy: list[Node] = None, edgesToCopy: list[Edge] = None):
+        self.nodes: list[Node] = [] # List of nodes
         self.edges: list[Edge] = [] # List of edges
         self.width = width
-        self.height = height
+        self.height = height # TODO Delete in constructor header and here
         
         # If this is requesting a copy, then copy all the nodes in nodesToCopy instead of initializing new ones
         if (copy):
             # [:] applies to all element in list, so make a list of copies of rows in self.nodes
-            self.nodes = [row[:] for row in nodesToCopy]
+            self.nodes = nodesToCopy[:]
             self.edges = edgesToCopy[:]
             return
-            
-        # Initialize variables for node construction
-        nodesMade: int = 0 # Used to increment node IDs
         
-        # Iterate through nodes, placing a node at each index
-        for y in range(height):
-            for x in range(width):
-                # Create new node
-                newNode = Node(str(nodesMade), x, y, 0.0)
+        # Open NodeData.csv
+        with open("backend\\NodeData.csv", mode='r') as file:
+            # Read all bytes from NodeData.csv
+            nodeDataFile = csv.reader(file)
+            
+            # Iterate through all lines except the first (the first is just a header)
+            for currentLine in nodeDataFile:
+                # Skip the first line
+                if (nodeDataFile.line_num == 1):
+                    continue
                 
-                # Add new node to list of nodes
-                self.nodes[y].append(newNode)
+                currentNodeID = currentLine[0]
+                currentNodeX = currentLine[1]
+                currentNodeY = currentLine[2]
+                currentNodeElevation = currentLine[3]
                 
-                # Increment nodesMade counter
-                nodesMade += 1
+                # Create a new node with the read information and add to this graph
+                newNode = Node(currentNodeID, currentNodeX, currentNodeY, currentNodeElevation)
+                self.nodes.append(newNode)
                 
-            self.nodes.append([])
         
         # Initialize variables for edge construction
         edgesMade: int = 0
         
-        # Iterate through nodes and connect them all via edges
-        for y in range(height):
-            for x in range(width):
-                # Connect current node to node below it, if not at bottom of graph
-                if y < height - 1:
-                    # Make all edges connecting row 9 to row 10, barring the middle one, stairs
-                    if y == 9 and x != 9:
-                        newVerticalEdge = Edge(str(edgesMade), weight=1, nodes=[self.nodes[y][x], self.nodes[y+1][x]], isStair = True, isSteepTerrain = False)
-                        self.nodes[y][x].edges.append(newVerticalEdge)
-                        self.nodes[y+1][x].edges.append(newVerticalEdge)
-                        self.edges.append(newVerticalEdge)
-                        edgesMade += 1
-                    # Make all edges connecting row 14 to row 15, barring the rightmost one, steep terrain
-                    elif y == 14 and x != 19:
-                        newVerticalEdge = Edge(str(edgesMade), weight=1, nodes=[self.nodes[y][x], self.nodes[y+1][x]], isStair = False, isSteepTerrain = True)
-                        self.nodes[y][x].edges.append(newVerticalEdge)
-                        self.nodes[y+1][x].edges.append(newVerticalEdge)
-                        self.edges.append(newVerticalEdge)
-                        edgesMade += 1
-                    # Make all other nodes neither steep terrain nor stairs
-                    else:
-                        newVerticalEdge = Edge(str(edgesMade), weight=1, nodes=[self.nodes[y][x], self.nodes[y+1][x]], isStair = False, isSteepTerrain = False)
-                        self.nodes[y][x].edges.append(newVerticalEdge)
-                        self.nodes[y+1][x].edges.append(newVerticalEdge)
-                        self.edges.append(newVerticalEdge)
-                        edgesMade += 1
-                    
-                # Connect current node to node to its right, if not at right edge of graph
-                if x < width - 1:
-                    newHorizontalEdge = Edge(str(edgesMade), weight=1, nodes=[self.nodes[y][x], self.nodes[y][x+1]], isStair = False, isSteepTerrain = False)
-                    self.nodes[y][x].edges.append(newHorizontalEdge)
-                    self.nodes[y][x+1].edges.append(newHorizontalEdge)
-                    self.edges.append(newHorizontalEdge)
-                    edgesMade += 1
+        # Read through the file again to connect the created nodes
+        with open("backend\\NodeData.csv", mode='r') as file:
+            # Read all bytes from NodeData.csv
+            nodeDataFile = csv.reader(file)
             
-    ## Gets the node at (xCoor, yCoor)
-    def getNodeFromCoor(self, yCoor: int, xCoor: int) -> Node:
-        return self.nodes[yCoor][xCoor]
+            # Iterate through all lines except the first (the first is just a header)
+            for currentLine in nodeDataFile:
+                # Skip the first line
+                if (nodeDataFile.line_num == 1):
+                    continue
+                
+                # Get the Node that the CurrentLine is associated with
+                currentNode: Node = self.getNodeFromID(currentLine[0])
+                
+                # Get the entries for connected nodes
+                connectedNodes = currentLine[4:]
+                
+                # Iterate through the connected nodes
+                for nodeID in connectedNodes:
+                    # Skip empty characters and commas
+                    if (nodeID == '' or nodeID == ","):
+                        continue
+                    
+                    # Get the node to connect
+                    otherNode: Node = self.getNodeFromID(nodeID)
+                    
+                    # Instantiate skip variable
+                    skipThisID = False
+                    
+                    # Ensure the nodes aren't already connected
+                    for edge in currentNode.edges:
+                        if otherNode in edge.nodes:
+                            skipThisID = True
+                            break
+                    
+                    # If the nodes aren't connected already, then create an edge
+                    if not skipThisID:
+                        newEdge: Edge = Edge(str(edgesMade), nodes=[currentNode, otherNode])
+                        
+                        currentNode.edges.append(newEdge)
+                        otherNode.edges.append(newEdge)
+                        
+                        self.edges.append(newEdge)
+                        
+                        edgesMade += 1
     
     ## Gets the node with ID "nodeID"
     def getNodeFromID(self, nodeID: str) -> Node:
         # Iterate through all nodes until node is found
-        for y in range(self.height):
-            for x in range(self.width):
-                if self.nodes[y][x].ID == nodeID:
-                    return self.nodes[y][x]
+        for node in self.nodes:
+            if node.ID == nodeID:
+                return node
                 
         # If we've reached here, the node wasn't found. Return None
         return None
