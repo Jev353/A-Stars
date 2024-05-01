@@ -7,8 +7,6 @@ from session_components import Schedule
 from session_components import AStar
 from session_components import User
 
-from database_connector import *
-
 import time
 from math import atan2, degrees
 
