@@ -71,9 +71,30 @@ def main():
     keepRunning = True
     
     while (keepRunning):
-        for i in pygame.event.get():
-            if i.type == pygame.QUIT:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 keepRunning = False
+                
+            # Handle node clicking
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Iterate through all nodes, checking which one was clicked
+                for node in clickableNodes:
+                    if node.clickRect.collidepoint(event.pos):
+                        # Update the node's color to purple
+                        pygame.draw.circle(node.surface, "purple", (node.radius, node.radius), node.radius)
+                        
+                        # Draw the new purple node to the screen
+                        screen.blit(node.surface, 
+                                   (node.x - node.surface.get_width()/2, 
+                                    node.y - node.surface.get_height()/2))
+                        
+                        # Don't check any more nodes
+                        break
+                
+                # Update the screen
+                pygame.display.update()
+                        
+                        
             
     pygame.quit()
     

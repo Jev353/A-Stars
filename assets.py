@@ -10,7 +10,7 @@ class ClickableNode:
         self.x = x
         self.y = y
         
-        self.radius = 5
+        self.radius = 25
         surfaceWidth = self.radius * 2
         surfaceHeight = self.radius * 2
         
@@ -19,3 +19,6 @@ class ClickableNode:
         
         # Draw a circle on the surface
         pygame.draw.circle(self.surface, "red", (self.radius, self.radius), self.radius)
+        
+        # Move the rect to the actual location
+        self.clickRect = pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius*2, self.radius*2)
