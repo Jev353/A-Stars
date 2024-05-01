@@ -14,12 +14,50 @@ from datetime import datetime # This is ridiculous and I hate python
 import time
 
 import pygame
+from assets import *
 
 graph = Graph(20, 20)
 aStar = AStar()
 activeUser: User
 
 def main():
+    # Initialize PyGame
+    pygame.init()
+    
+    # Initialize screen
+    windowWidth: int = 2000
+    windowHeight: int = 828
+    screen = pygame.display.set_mode((windowWidth, windowHeight))
+    
+    # Copy the non-ADA to the screen
+    screen.blit(mapNoADAImage, (0,0))
+    
+    # Initialize storage for UI Nodes
+    clickableNodes: list[ClickableNode] = []
+    
+    # Create a UI Node for each node in the graph
+    for node in graph.nodes:
+        newClickableNode = ClickableNode(int(node.xCoordinate), int(node.yCoordinate))
+        clickableNodes.append(newClickableNode)
+        
+        # Copy the new ClickableNode to the screen
+        screen.blit(newClickableNode.surface, 
+                    (newClickableNode.x - newClickableNode.surface.get_width()/2, 
+                     newClickableNode.y - newClickableNode.surface.get_height()/2))
+    
+    # Display the screen
+    pygame.display.update()
+    
+    keepRunning = True
+    
+    while (keepRunning):
+        for i in pygame.event.get():
+            if i.type == pygame.QUIT:
+                keepRunning = False
+            
+    pygame.quit()
+    
+    
     # Initialize active user object
     global activeUser
     activeUser = loginMenu()
