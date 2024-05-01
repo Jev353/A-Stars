@@ -10,7 +10,7 @@ class ClickableNode:
         self.x = x
         self.y = y
         
-        self.radius = 25
+        self.radius = 5
         surfaceWidth = self.radius * 2
         surfaceHeight = self.radius * 2
         

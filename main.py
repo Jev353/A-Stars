@@ -9,9 +9,8 @@ from session_components import User
 
 from database_connector import *
 
-from datetime import datetime # This is ridiculous and I hate python
-
 import time
+from math import atan2, degrees
 
 import pygame
 from assets import *
@@ -44,6 +43,27 @@ def main():
         screen.blit(newClickableNode.surface, 
                     (newClickableNode.x - newClickableNode.surface.get_width()/2, 
                      newClickableNode.y - newClickableNode.surface.get_height()/2))
+    
+    # Draw lines representing edges for each node
+    for edge in graph.edges:
+        
+        # Initialize leftmost and rightmost node variables
+        leftmostNode: Node
+        rightmostNode: Node
+        
+        # Get the leftmost node 
+        if (int(edge.nodes[0].xCoordinate) <= int(edge.nodes[1].xCoordinate)):
+            leftmostNode = edge.nodes[0]
+            rightmostNode = edge.nodes[1]
+        else:
+            leftmostNode = edge.nodes[1]
+            rightmostNode = edge.nodes[0]
+        
+        pygame.draw.line(screen, "green", 
+                         (int(leftmostNode.xCoordinate), int(leftmostNode.yCoordinate)), 
+                         (int(rightmostNode.xCoordinate), int(rightmostNode.yCoordinate)), 
+                         3)        
+        #break
     
     # Display the screen
     pygame.display.update()
