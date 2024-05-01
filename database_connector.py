@@ -16,7 +16,7 @@ database = mysql.connector.connect(
     host="srv872.hstgr.io",
     port="3306",
     user="u425992461_WalkEaseRoot",
-    passwd="<>UnH^ackable@@@6",
+    passwd="",
     database="u425992461_WalkEase",
     connection_timeout=3600
 )

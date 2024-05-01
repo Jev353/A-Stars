@@ -13,6 +13,8 @@ from datetime import datetime # This is ridiculous and I hate python
 
 import time
 
+import pygame
+
 graph = Graph(20, 20)
 aStar = AStar()
 activeUser: User
