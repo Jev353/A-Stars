@@ -23,7 +23,7 @@ activeUser: User
 pygame.init()
 
 # Initialize screen
-windowWidth: int = 2000
+windowWidth: int = 1152
 windowHeight: int = 828
 screen = pygame.display.set_mode((windowWidth, windowHeight))
 
