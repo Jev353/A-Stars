@@ -93,7 +93,7 @@ class Graph():
             return
         
         # Open NodeData.csv
-        with open("backend\\NodeData.csv", mode='r') as file:
+        with open("NodeData.csv", mode='r') as file:
             # Read all bytes from NodeData.csv
             nodeDataFile = csv.reader(file)
             
@@ -117,7 +117,7 @@ class Graph():
         edgesMade: int = 0
         
         # Read through the file again to connect the created nodes
-        with open("backend\\NodeData.csv", mode='r') as file:
+        with open("NodeData.csv", mode='r') as file:
             # Read all bytes from NodeData.csv
             nodeDataFile = csv.reader(file)
             
