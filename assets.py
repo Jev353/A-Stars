@@ -6,7 +6,8 @@ mapNoADAImage = pygame.image.load("assets\\mapNoADA.png")
 
 ## UI Object representing a node that can be clicked
 class ClickableNode:
-    def __init__(self, x: int, y: int):
+    def __init__(self, ID: str, x: int, y: int):
+        self.ID = ID
         self.x = x
         self.y = y
         

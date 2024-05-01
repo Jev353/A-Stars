@@ -104,9 +104,9 @@ class Graph():
                     continue
                 
                 currentNodeID = currentLine[0]
-                currentNodeX = currentLine[1]
-                currentNodeY = currentLine[2]
-                currentNodeElevation = currentLine[3]
+                currentNodeX = int(currentLine[1])
+                currentNodeY = int(currentLine[2])
+                currentNodeElevation = float(currentLine[3])
                 
                 # Create a new node with the read information and add to this graph
                 newNode = Node(currentNodeID, currentNodeX, currentNodeY, currentNodeElevation)
