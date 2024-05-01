@@ -177,50 +177,6 @@ class Graph():
         for edge in self.edges:
             if edge.ID == edgeID:
                 return edge
-    
-    ## Prints the graph to the console
-    def printGraph(self, startNodeID: str = None, goalNodeID: str = None, pathEdgesIDs: list[str] = None) -> None:
-        # Initialize pathNodes list
-        pathNodeIDs: list[Node] = []
-        
-        # If list of edge IDs was passed, get the nodes that those edges connect
-        if pathEdgesIDs != None:
-            for edgeID in pathEdgesIDs:
-                edge = self.getEdgeFromID(edgeID)
-                
-                for node in edge.nodes:
-                    pathNodeIDs.append(node.ID)
-            # If there are no edges on the path, then the start node and goal node must be the same
-            if len(pathEdgesIDs) == 0:
-                print("Start node and goal node are the same!")
-                
-        
-        # Iterate through graph, printing each node
-        for y in range(self.height):
-            for x in range(self.width):
-                # Print node as S if start node
-                if startNodeID == self.nodes[y][x].ID:
-                    print("S", end='')
-                # Print node as G if goal node
-                elif goalNodeID == self.nodes[y][x].ID:
-                    print("G", end='')
-                # print node as B if building node
-                elif self.nodes[y][x].isBuilding:
-                    print("B", end='')
-                # Print node as X if on path
-                elif self.nodes[y][x].ID in pathNodeIDs:
-                    print("X", end='')
-                # Print node as O if nothing special
-                else:
-                    print("O", end='')
-                    
-                # Add "--" to represent edge if not at end of row
-                if x < self.width - 1:
-                    print("-", end='')
-                # Add newline if at end of row
-                else:
-                    print()
-                    
         
     # Creates a deepcopy of this graph
     def getDeepCopy(self) -> Graph:
