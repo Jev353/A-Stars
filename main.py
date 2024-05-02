@@ -1,14 +1,8 @@
 from map_components import Edge
 from map_components import Node
 from map_components import Graph
-from session_components import Route
-from session_components import ScheduleRoute
-from session_components import Schedule
 from session_components import AStar
 from session_components import User
-
-import time
-from math import atan2, degrees
 
 import pygame
 from assets import *
