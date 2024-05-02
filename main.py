@@ -4,11 +4,17 @@ from map_components import Graph
 from session_components import AStar
 from session_components import User
 
+from PyQt6 import uic
+from PyQt6.QtWidgets import QApplication, QLineEdit, QPushButton
+
 import pygame
 from assets import *
 
+# Initialize map information
 graph = Graph(20, 20)
 aStar = AStar()
+
+# Initialize user object
 activeUser: User
 
 # Initialize PyGame
@@ -23,6 +29,40 @@ screen = pygame.display.set_mode((windowWidth, windowHeight))
 clickableNodes: list[ClickableNode] = []
 
 def main():
+    # Load in data from the login.ui file
+    Form, Window = uic.loadUiType("login.ui")
+
+    # Get the application, window, and form
+    app = QApplication([])
+    window = Window()
+    form = Form()
+    
+    # Setup the UI using the window, display the window to the app
+    form.setupUi(window)
+    window.show()
+    
+    # Initialize various QWidget variables
+    usernameLineEdit: QLineEdit
+    signUpPushButton: QPushButton
+    logInPushButton: QPushButton
+    
+    # Get the necessary QWidgets from the app
+    for widget in app.allWidgets():
+        if type(widget) == QLineEdit:
+            usernameLineEdit = widget
+            continue
+        if type(widget) == QPushButton and widget.objectName == "signUpPushButton":
+            signUpPushButton = widget
+            continue
+        if type(widget) == QPushButton and widget.objectName == "logInPushButton":
+            logInPushButton = widget
+            continue
+    
+    # Execute the application
+    app.exec()
+    
+    print(app.widgetAt)
+    
     # Displays the screen, including the Nodes
     resetScreen()
     

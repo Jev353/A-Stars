@@ -23,9 +23,6 @@
       <height>201</height>
      </rect>
     </property>
-    <property name="title">
-     <string>GroupBox</string>
-    </property>
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
@@ -66,27 +63,7 @@
       <string>Username</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>90</y>
-       <width>71</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Password</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="usernameLineEdit">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -96,17 +73,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_2">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>90</y>
-       <width>211</width>
-       <height>21</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="signUpButton">
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -119,7 +86,7 @@
       <string>Sign up</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="logInButton">
      <property name="geometry">
       <rect>
        <x>180</x>
