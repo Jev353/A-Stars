@@ -4,8 +4,11 @@ from map_components import Graph
 from session_components import AStar
 from session_components import User
 
+from database_connector import *
+
 from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QLineEdit, QPushButton
+from PyQt6.QtCore import pyqtSlot
 
 import pygame
 from assets import *
@@ -42,26 +45,28 @@ def main():
     window.show()
     
     # Initialize various QWidget variables
-    usernameLineEdit: QLineEdit
-    signUpPushButton: QPushButton
-    logInPushButton: QPushButton
+    usernameLineEdit: QLineEdit = QLineEdit()
+    signUpPushButton: QPushButton = QPushButton()
+    logInPushButton: QPushButton = QPushButton()
     
     # Get the necessary QWidgets from the app
     for widget in app.allWidgets():
         if type(widget) == QLineEdit:
             usernameLineEdit = widget
             continue
-        if type(widget) == QPushButton and widget.objectName == "signUpPushButton":
+        if type(widget) == QPushButton and widget.text() == "Sign up":
             signUpPushButton = widget
             continue
-        if type(widget) == QPushButton and widget.objectName == "logInPushButton":
+        if type(widget) == QPushButton and widget.text() == "Login":
             logInPushButton = widget
             continue
     
+    # Connect buttons to functions
+    signUpPushButton.clicked.connect(attemptAccountCreation)
+    logInPushButton.clicked.connect(attemptLogin)
+    
     # Execute the application
     app.exec()
-    
-    print(app.widgetAt)
     
     # Displays the screen, including the Nodes
     resetScreen()
@@ -74,7 +79,7 @@ def main():
     while (keepRunning):
         # If 2 nodes have been selected, generate and display a route between them
         if (len(selectedNodes) == 2 and not routeDisplayed):
-            generateAndDisplayRoute(selectedNodes[0], selectedNodes[1])
+            self.generateAndDisplayRoute(selectedNodes[0], selectedNodes[1])
             routeDisplayed = True
         
         for event in pygame.event.get():
@@ -90,14 +95,14 @@ def main():
                         if (len(selectedNodes) >= 2):
                             selectedNodes.clear()
                             routeDisplayed = False
-                            resetScreen()
+                            self.resetScreen()
                         
                         # Update the node's color to purple
                         pygame.draw.circle(node.surface, "purple", (node.radius, node.radius), node.radius)
                         
                         # Draw the new purple node to the screen
                         screen.blit(node.surface, 
-                                   (node.x - node.surface.get_width()/2, 
+                                (node.x - node.surface.get_width()/2, 
                                     node.y - node.surface.get_height()/2))
                         
                         # Mark the node as selected
@@ -110,12 +115,16 @@ def main():
                 pygame.display.update()
                         
     pygame.quit()
-    
-    # Initialize active user object
-    # global activeUser
-    # activeUser = loginMenu()
-    
-    # mainMenu()
+
+# Attempts to log the user in with the username in usernameLineEdit.
+# Returns the user's ID if found, and None otherwise
+def attemptLogin():
+    print("Login")
+
+# Attempts create an account with the username in usernameLineEdit.
+# Returns the user's new ID if account was made, and None if the username was taken
+def attemptAccountCreation():
+    print("Signup")
 
 # Resets the screen to how it looked upon boot
 def resetScreen(displayEdges: bool = False):
@@ -123,11 +132,11 @@ def resetScreen(displayEdges: bool = False):
     screen.blit(mapNoADAImage, (0,0))
     
     # Display all nodes
-    displayAllNodes()
+    self.displayAllNodes()
     
     # Only display edges if requested
     if displayEdges:
-        displayAllEdges()
+        self.displayAllEdges()
         
     # Update the window
     pygame.display.update()
@@ -142,7 +151,7 @@ def displayAllNodes():
         # Copy the new ClickableNode to the screen
         screen.blit(newClickableNode.surface, 
                     (newClickableNode.x - newClickableNode.surface.get_width()/2, 
-                     newClickableNode.y - newClickableNode.surface.get_height()/2))
+                    newClickableNode.y - newClickableNode.surface.get_height()/2))
         
     # Update the window
     pygame.display.update()
@@ -164,9 +173,9 @@ def displayAllEdges():
             rightmostNode = edge.nodes[0]
         
         pygame.draw.line(screen, "green", 
-                         (int(leftmostNode.xCoordinate), int(leftmostNode.yCoordinate)), 
-                         (int(rightmostNode.xCoordinate), int(rightmostNode.yCoordinate)), 
-                         3)        
+                        (int(leftmostNode.xCoordinate), int(leftmostNode.yCoordinate)), 
+                        (int(rightmostNode.xCoordinate), int(rightmostNode.yCoordinate)), 
+                        3)        
     
     # Update the window
     pygame.display.update()
@@ -199,13 +208,13 @@ def generateAndDisplayRoute(firstNode: ClickableNode, secondNode: ClickableNode)
             rightmostNode = edge.nodes[0]
         
         pygame.draw.line(screen, "blue", 
-                         (int(leftmostNode.xCoordinate), int(leftmostNode.yCoordinate)), 
-                         (int(rightmostNode.xCoordinate), int(rightmostNode.yCoordinate)), 
-                         3)
+                        (int(leftmostNode.xCoordinate), int(leftmostNode.yCoordinate)), 
+                        (int(rightmostNode.xCoordinate), int(rightmostNode.yCoordinate)), 
+                        3)
         
     # Reset graph due to issues with deep copy
     graph = Graph(20, 20)
         
     pygame.display.update()
-  
+
 main()
