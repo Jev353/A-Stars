@@ -1,3 +1,5 @@
+import math
+import tkinter as tk
 from map_components import Node
 from map_components import Edge
 from map_components import Graph
@@ -44,7 +46,8 @@ class AStar():
         pass
     
     ## Returns a list of edges which connect the startNode and endNode
-    def generateRoutePath(self, graph: Graph, startNodeID: str, goalNodeID: str, avoidStairs: str=False, avoidSteepTerrain: str=False) -> list[str]:
+    # avoidStairs: str = False, avoidSteepTerrain: str = False
+    def generateRoutePath(self, graph: Graph, startNodeID: str, goalNodeID: str, avoidStairs: bool = False) -> list[str]:
         # Return empty list if goal is start 
         if startNodeID == goalNodeID:
             return []
@@ -59,7 +62,6 @@ class AStar():
         
         # Initialize startNode
         startNode.gScore = 0.0
-        startNode.hScore = self.heuristicFunction(startNode, goalNode)
         startNode.fScore = 0.0
         
         # Initialize list of visited nodes
@@ -85,8 +87,8 @@ class AStar():
                 if currentEdge.isStair and avoidStairs:
                     continue
                 # Go to next edge if currenteEdge is steep terrain and user wants to avoid steep terrain
-                if currentEdge.isSteepTerrain and avoidSteepTerrain:
-                    continue
+                # if currentEdge.isSteepTerrain and avoidSteepTerrain:
+                #     continue
                 
                 # Get neighbor that the current edge connects to
                 neighbor: Node = currentEdge.getOtherNode(currentNode)
@@ -106,7 +108,12 @@ class AStar():
                 else:
                     # Calculate fScore for current path to neighbor
                     tempGScore: float = currentNode.gScore + currentEdge.weight
-                    tempHScore: float = self.heuristicFunction(neighbor, goalNode)
+                    # h score is set based on user selection, g and f will be different between each option
+                    tempHScore: float = self.heuristics[choice.get()](startNode, goalNode)
+                    # adds extra cost to the path if the user selects to avoid steepness
+                    if choice.get() == "Easy Route":
+                        elevation = abs(currentNode.altitude - neighbor.altitude)
+                        tempGScore += elevation * 2
                     tempFScore: float = tempGScore + tempHScore
                     
                     # If neighbor has not been visited before OR our current pathing is faster
@@ -126,10 +133,20 @@ class AStar():
     ## Returns the heuristic value of the given node for the path's goal node
     def heuristicFunction(self, node: Node, goalNode: Node) -> float:
         # Return Manhattan Distance
-        return (abs(node.xCoordinate - goalNode.xCoordinate) + abs(node.yCoordinate - goalNode.yCoordinate))
-                    
-        # Return Euclidian Distance (likely better for final implementation, as others are best for grids)
-        # return math.sqrt((node.xCoordinate - goalNode.xCoordinate)**2 + (node.yCoordinate - goalNode.yCoordinate)**2)
+        # return (abs(node.xCoordinate - goalNode.xCoordinate) + abs(node.yCoordinate - goalNode.yCoordinate))
+        # Return Euclidian Distance
+        return math.sqrt((node.xCoordinate - goalNode.xCoordinate)**2 + (node.yCoordinate - goalNode.yCoordinate)**2)
+
+    ## an extension of the heuristic function, giving the user the option to generate
+    ## a path that's physically easier to travel, i.e., less rate of change in elevation
+    def elevationHeuristic(self, node: Node, goalNode: Node) -> float:
+        elevation = abs(node.altitude - goalNode.altitude)
+        euclidean_distance = math.sqrt((node.xCoordinate - goalNode.xCoordinate) ** 2 + (node.yCoordinate - goalNode.yCoordinate) ** 2)
+        return euclidean_distance + elevation * 2
+
+    # table structure holding the two path generating heuristic options
+    HEURISTIC = heuristicFunction
+    heuristics = {"Standard Route": heuristicFunction, "Easy Route": elevationHeuristic}
     
     ## Returns list of edges that form found path
     def getPathFromGoalNode(self, goalNode: Node):
@@ -153,6 +170,38 @@ class AStar():
         
         # All edges have been added, since entire path has been traversed backwards
         return edgeIDs
+
+# tkinter
+# constructs a new window where the user is able to select a heuristic function
+## ALERT: PROGRAM STOPS READING CODE AT THIS LINE
+# not great style-wise, but it will work for now in testing
+window = tk.Tk()
+window.geometry("220x150")
+window.title("Pathing Options")
+choice = tk.StringVar(window)
+pathing_options = [
+    "Standard Route",
+    "Easy Route",
+]
+
+choice_txt = tk.StringVar()
+choice_label = tk.Label(window, textvariable=choice_txt)
+choice_txt.set("Generation Type: ")
+choice_label.pack()
+# user selected function will be stored here, it defaults as standard, but user can change it
+choice.set(pathing_options[0])
+
+choice_select = tk.OptionMenu(window, choice, *pathing_options)
+choice_select.pack()
+
+def confirm_choice():
+    window.destroy()
+
+
+confirm_choice_button = tk.Button(window, text="Confirm Selection", command=confirm_choice)
+confirm_choice_button.pack(side=tk.BOTTOM, pady=10)
+
+window.mainloop()
                 
 ### Represents a user
 class User():
