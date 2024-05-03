@@ -79,7 +79,7 @@ def main():
     while (keepRunning):
         # If 2 nodes have been selected, generate and display a route between them
         if (len(selectedNodes) == 2 and not routeDisplayed):
-            self.generateAndDisplayRoute(selectedNodes[0], selectedNodes[1])
+            generateAndDisplayRoute(selectedNodes[0], selectedNodes[1])
             routeDisplayed = True
         
         for event in pygame.event.get():
@@ -95,7 +95,7 @@ def main():
                         if (len(selectedNodes) >= 2):
                             selectedNodes.clear()
                             routeDisplayed = False
-                            self.resetScreen()
+                            resetScreen()
                         
                         # Update the node's color to purple
                         pygame.draw.circle(node.surface, "purple", (node.radius, node.radius), node.radius)
@@ -132,11 +132,11 @@ def resetScreen(displayEdges: bool = False):
     screen.blit(mapNoADAImage, (0,0))
     
     # Display all nodes
-    self.displayAllNodes()
+    displayAllNodes()
     
     # Only display edges if requested
     if displayEdges:
-        self.displayAllEdges()
+        displayAllEdges()
         
     # Update the window
     pygame.display.update()
