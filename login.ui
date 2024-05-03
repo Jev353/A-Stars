@@ -63,6 +63,26 @@
       <string>Username</string>
      </property>
     </widget>
+    <widget class="QLabel" name="errorLabel">
+     <property name="geometry">
+      <rect>
+       <x>131</x>
+       <y>105</y>
+       <width>200</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string></string>
+     </property>
+    </widget>
     <widget class="QLineEdit" name="usernameLineEdit">
      <property name="geometry">
       <rect>

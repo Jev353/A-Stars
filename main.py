@@ -7,7 +7,7 @@ from session_components import User
 from database_connector import *
 
 from PyQt6 import uic
-from PyQt6.QtWidgets import QApplication, QLineEdit, QPushButton
+from PyQt6.QtWidgets import QApplication, QLineEdit, QPushButton, QLabel
 from PyQt6.QtCore import pyqtSlot
 
 import pygame
@@ -40,6 +40,7 @@ clickableNodes: list[ClickableNode] = []
 usernameLineEdit: QLineEdit = QLineEdit()
 signUpPushButton: QPushButton = QPushButton()
 logInPushButton: QPushButton = QPushButton()
+errorLabel: QLabel = QLabel()
 
 def main():
     # Initialize and display the Login menu
@@ -107,19 +108,23 @@ def attemptLogin():
     global usernameLineEdit
     global activeUser
     global app
+    global errorLabel
     
-    # You literally have to get the QLineEdit every time the button is pressed, or the 
+    # You literally have to get a widget every time the button is pressed or the 
     # text won't update. Insane
     for widget in app.allWidgets():
         if type(widget) == QLineEdit:
             usernameLineEdit = widget
-            break
+            continue
+        if type(widget) == QLabel and widget.text() == "":
+            errorLabel = widget
+            continue
     
     user = getUserFromUsername(usernameLineEdit.text())
     
-    # Don't do anything if the account doesn't exist
+    # Display error message if account doesn't exist
     if (user == None):
-        return
+        errorLabel.setText("Login Failed")
     else:
         activeUser = user
         
@@ -132,19 +137,23 @@ def attemptAccountCreation():
     global usernameLineEdit
     global activeUser
     global app
+    global errorLabel
     
-    # You literally have to get the QLineEdit every time the button is pressed, or the 
+    # You literally have to get a widget every time the button is pressed or the 
     # text won't update. Insane
     for widget in app.allWidgets():
         if type(widget) == QLineEdit:
             usernameLineEdit = widget
-            break
+            continue
+        if type(widget) == QLabel and widget.text() == "":
+            errorLabel = widget
+            continue
     
     user = addNewUser(usernameLineEdit.text())
     
-    # Don't do anything if the account couldn't be created
+    # Display error message if account can't be created
     if (user == -1):
-        return
+        errorLabel.setText("Username Taken")
     else:
         activeUser = getUserFromUsername(usernameLineEdit.text())
         
@@ -209,6 +218,7 @@ def initLoginMenu():
     global usernameLineEdit
     global activeUser
     global app
+    global errorLabel
     
     # Setup the UI using the window, display the window to the app
     form.setupUi(window)
@@ -224,6 +234,9 @@ def initLoginMenu():
             continue
         if type(widget) == QPushButton and widget.text() == "Login":
             logInPushButton = widget
+            continue
+        if type(widget) == QLabel and widget.text() == "":
+            errorLabel = widget
             continue
     
     # Connect buttons to functions
