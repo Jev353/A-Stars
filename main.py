@@ -18,63 +18,48 @@ graph = Graph(20, 20)
 aStar = AStar()
 
 # Initialize user object
-activeUser: User
+activeUser: User = None
 
-# Initialize PyGame
-pygame.init()
-
-# Initialize screen
+# Initialize pygame screen
 windowWidth: int = 1152
 windowHeight: int = 828
 screen = pygame.display.set_mode((windowWidth, windowHeight))
 
+# Load in data from the login.ui file
+Form, Window = uic.loadUiType("login.ui")
+
+# Get the application, window, and form
+app = QApplication([])
+window = Window()
+form = Form()
+
 # Initialize storage for UI Nodes
 clickableNodes: list[ClickableNode] = []
 
-def main():
-    # Load in data from the login.ui file
-    Form, Window = uic.loadUiType("login.ui")
+# Initialize various QWidget variables
+usernameLineEdit: QLineEdit = QLineEdit()
+signUpPushButton: QPushButton = QPushButton()
+logInPushButton: QPushButton = QPushButton()
 
-    # Get the application, window, and form
-    app = QApplication([])
-    window = Window()
-    form = Form()
+def main():
+    # Initialize and display the Login menu
+    initLoginMenu()
     
-    # Setup the UI using the window, display the window to the app
-    form.setupUi(window)
-    window.show()
+    # If we've reached here and the activeUser is still None, then the user X'd out of the login screen
+    if activeUser == None:
+        return
     
-    # Initialize various QWidget variables
-    usernameLineEdit: QLineEdit = QLineEdit()
-    signUpPushButton: QPushButton = QPushButton()
-    logInPushButton: QPushButton = QPushButton()
+    # Initialize PyGame
+    pygame.init()
     
-    # Get the necessary QWidgets from the app
-    for widget in app.allWidgets():
-        if type(widget) == QLineEdit:
-            usernameLineEdit = widget
-            continue
-        if type(widget) == QPushButton and widget.text() == "Sign up":
-            signUpPushButton = widget
-            continue
-        if type(widget) == QPushButton and widget.text() == "Login":
-            logInPushButton = widget
-            continue
-    
-    # Connect buttons to functions
-    signUpPushButton.clicked.connect(attemptAccountCreation)
-    logInPushButton.clicked.connect(attemptLogin)
-    
-    # Execute the application
-    app.exec()
-    
-    # Displays the screen, including the Nodes
+    # Displays the PyGame screen, including the Nodes
     resetScreen()
     
     # Initialize list of selected nodes
     selectedNodes: list[ClickableNode] = []
     routeDisplayed = False
     
+    # Run PyGame until the user exits
     keepRunning = True
     while (keepRunning):
         # If 2 nodes have been selected, generate and display a route between them
@@ -117,14 +102,54 @@ def main():
     pygame.quit()
 
 # Attempts to log the user in with the username in usernameLineEdit.
-# Returns the user's ID if found, and None otherwise
 def attemptLogin():
-    print("Login")
+    # You can't pass arguments to button functions D:
+    global usernameLineEdit
+    global activeUser
+    global app
+    
+    # You literally have to get the QLineEdit every time the button is pressed, or the 
+    # text won't update. Insane
+    for widget in app.allWidgets():
+        if type(widget) == QLineEdit:
+            usernameLineEdit = widget
+            break
+    
+    user = getUserFromUsername(usernameLineEdit.text())
+    
+    # Don't do anything if the account doesn't exist
+    if (user == None):
+        return
+    else:
+        activeUser = user
+        
+        # Advance to the PyGame part if we've logged in
+        app.quit()
 
 # Attempts create an account with the username in usernameLineEdit.
-# Returns the user's new ID if account was made, and None if the username was taken
 def attemptAccountCreation():
-    print("Signup")
+    # You can't pass arguments to button functions D:
+    global usernameLineEdit
+    global activeUser
+    global app
+    
+    # You literally have to get the QLineEdit every time the button is pressed, or the 
+    # text won't update. Insane
+    for widget in app.allWidgets():
+        if type(widget) == QLineEdit:
+            usernameLineEdit = widget
+            break
+    
+    user = addNewUser(usernameLineEdit.text())
+    
+    # Don't do anything if the account couldn't be created
+    if (user == -1):
+        return
+    else:
+        activeUser = getUserFromUsername(usernameLineEdit.text())
+        
+        # Advance to the PyGame part if we've logged in
+        app.quit()
 
 # Resets the screen to how it looked upon boot
 def resetScreen(displayEdges: bool = False):
@@ -179,6 +204,34 @@ def displayAllEdges():
     
     # Update the window
     pygame.display.update()
+
+def initLoginMenu():
+    global usernameLineEdit
+    global activeUser
+    global app
+    
+    # Setup the UI using the window, display the window to the app
+    form.setupUi(window)
+    window.show()
+    
+    # Get the necessary QWidgets from the app
+    for widget in app.allWidgets():
+        if type(widget) == QLineEdit:
+            usernameLineEdit = widget
+            continue
+        if type(widget) == QPushButton and widget.text() == "Sign up":
+            signUpPushButton = widget
+            continue
+        if type(widget) == QPushButton and widget.text() == "Login":
+            logInPushButton = widget
+            continue
+    
+    # Connect buttons to functions
+    signUpPushButton.clicked.connect(attemptAccountCreation)
+    logInPushButton.clicked.connect(attemptLogin)
+    
+    # Execute the application
+    app.exec()
 
 # Generates a route between the two nodes via AStar and displays it
 def generateAndDisplayRoute(firstNode: ClickableNode, secondNode: ClickableNode):
