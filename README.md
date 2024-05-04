@@ -5,12 +5,17 @@ This application is designed to provide students at Washington State University 
 
 ### Usage Instructions
 Before anything else is done, the user's machine must have Python3 and Pip installed. Pip is a command line tool for downloading Python libraries, and instructions for download can be found here: https://pip.pypa.io/en/stable/installation/
-After the user installs Pip (possibly adding the installation file to their machine's PATH variable), the user should run the following commands via Command Prompt on Windows:
+
+After the user installs Pip (possibly adding the installation folder to their machine's PATH variable), the user should run the following commands via Command Prompt on Windows:
 > pip install mysqlx-connector-python
+
 > pip install PyQt6
+
 > pip install pygame
+
 After this, the user should extract all files in the Main branch to a new folder on their machine, then run main.py either through Command Prompt with the following command:
 > py main.py
+
 or by running main.py through an IDE.
 
 A login page should appear, from which the user should either sign up or log in. After successfully logging in, the user can click the nodes (red circles) on the WSU map to get a route between the two selected nodes.
