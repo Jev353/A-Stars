@@ -6,6 +6,8 @@ from session_components import User
 
 from database_connector import *
 
+import os
+
 from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QLineEdit, QPushButton, QLabel
 from PyQt6.QtCore import pyqtSlot
@@ -223,6 +225,9 @@ def initLoginMenu():
     # Setup the UI using the window, display the window to the app
     form.setupUi(window)
     window.show()
+    
+    # Set window position
+    window.move(705, 96)
     
     # Get the necessary QWidgets from the app
     for widget in app.allWidgets():
